@@ -1,7 +1,7 @@
-package com.github.cuzfrog.spatest
+package com.github.cuzfrog.webdriver
 
 import spray.json._
-import DefaultJsonProtocol._
+import spray.json.DefaultJsonProtocol._
 import com.typesafe.scalalogging.LazyLogging
 
 sealed trait Message { def name = this.getClass.getSimpleName }

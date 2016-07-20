@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
 )
 mainClass in reStart := Some("com.github.cuzfrog.spatest.Server")
 
-lazy val messager = (project in file("./message"))
+lazy val messager = (project in file("./messager"))
   .settings(
     name := "WebDriverMessager",
     version := Settings.version,
