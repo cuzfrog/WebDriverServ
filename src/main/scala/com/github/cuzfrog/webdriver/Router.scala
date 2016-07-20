@@ -1,5 +1,7 @@
 package com.github.cuzfrog.webdriver
 
+import java.nio.ByteBuffer
+
 object Router {
-  def response(msg:String):String = ???
+  def response(msg: Array[Byte]): Array[Byte] = ???
 }

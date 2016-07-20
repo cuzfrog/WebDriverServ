@@ -22,7 +22,6 @@ object Client {
   // implicit execution context
 
   def tell(message: Message)(implicit host: String): Future[HttpResponse] = {
-    implicit val pickler = Message.pickler
     val data = boopickle.Default.Pickle.intoBytes(message)
 
     (IO(Http) ? HttpRequest(method = HttpMethods.POST, uri = Uri(s"$host/tell"), entity = HttpEntity(data.array()))).mapTo[HttpResponse]
