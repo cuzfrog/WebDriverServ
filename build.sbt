@@ -11,7 +11,6 @@ resolvers ++= Seq(
 
 lazy val server = (project in file(".")).dependsOn(client)
 libraryDependencies ++= Seq(
-  "io.spray" %% "spray-routing" % "1.3.2",
   "io.spray" %% "spray-can" % "1.3.2",
   "com.typesafe.akka" %% "akka-actor" % "2.4.7"
 )
@@ -25,7 +24,6 @@ lazy val client = (project in file("./client"))
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
-      "io.spray" %%  "spray-json" % "1.3.2",
       "io.spray" %% "spray-can" % "1.3.2",
       "com.lihaoyi" %% "upickle" % "0.4.1",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
