@@ -1,6 +1,8 @@
 package com.github.cuzfrog.webdriver
 
-class ClientDriver(val host: String, id: Long, var focus: Window) {
+import Elements._
+
+case class Driver(name: String) {
 
   def findElement(attr: String, value: String): Option[Element] = ???
 

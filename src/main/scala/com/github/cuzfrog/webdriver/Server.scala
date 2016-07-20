@@ -8,15 +8,16 @@ import akka.actor.Props
 import akka.actor.Actor
 import spray.http.Uri
 import akka.io.IO
+import org.openqa.selenium.WebDriver
 import spray.http.HttpMethods
 
 object Server extends App {
   System.setProperty("webdriver.ie.driver", "C:/program1/Selenium/IEDriverServer.exe")
 
+  lazy val drivers = scala.collection.concurrent.TrieMap.empty[String, WebDriver]
 
-
-  implicit val system = ActorSystem("WebDriverServ")
-  val handler = system.actorOf(Props[Service], name = "handler")
+  implicit lazy val system = ActorSystem("WebDriverServ")
+  lazy val handler = system.actorOf(Props[Service], name = "handler")
   IO(Http) ! Http.Bind(handler, interface = "localhost", port = 90001)
 }
 
