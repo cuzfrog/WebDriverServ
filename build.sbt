@@ -12,19 +12,20 @@ lazy val server = (project in file(".")).dependsOn(messager)
 libraryDependencies ++= Seq(
   "io.spray" %% "spray-routing" % "1.3.2",
   "io.spray" %% "spray-can" % "1.3.2",
-  "com.lihaoyi" %% "upickle" % "0.4.1",
   "com.typesafe.akka" %% "akka-actor" % "2.4.7"
 )
 mainClass in reStart := Some("com.github.cuzfrog.spatest.Server")
 
 lazy val messager = (project in file("./messager"))
   .settings(
+    organization := "com.github.cuzfrog",
     name := "WebDriverMessager",
     version := Settings.version,
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
       "io.spray" %%  "spray-json" % "1.3.2",
+      "com.lihaoyi" %% "upickle" % "0.4.1",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
       "ch.qos.logback" %  "logback-classic" % "1.1.3"
     )
