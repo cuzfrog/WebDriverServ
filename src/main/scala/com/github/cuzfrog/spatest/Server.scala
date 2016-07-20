@@ -12,12 +12,11 @@ object Server extends App with SimpleRoutingApp {
   implicit val system = ActorSystem("WebDriverServ")
 
   startServer(interface = "localhost", port = 90001) {
-    get {
-      path("" / Segment) { msg =>
+    post {
+      path("tell") { ctx =>
         complete {
-          println(s"recieve request. $msg")
-
-          ""
+          println(s"recieve request. $ctx")
+          Router.response(ctx.request.entity.data.asString)
         }
       }
     }
