@@ -11,8 +11,7 @@ resolvers ++= Seq(
 
 lazy val server = (project in file(".")).dependsOn(client)
 libraryDependencies ++= Seq(
-  "io.spray" %% "spray-can" % "1.3.2",
-  "com.typesafe.akka" %% "akka-actor" % "2.4.7"
+  
 )
 mainClass in reStart := Some("com.github.cuzfrog.spatest.Server")
 
@@ -25,7 +24,8 @@ lazy val client = (project in file("./client"))
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
       "io.spray" %% "spray-can" % "1.3.2",
-      "com.lihaoyi" %% "upickle" % "0.4.1",
+      "com.typesafe.akka" %% "akka-actor" % "2.4.7",
+      "me.chrons" %% "boopickle" % "1.2.4",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
       "ch.qos.logback" %  "logback-classic" % "1.1.3"
     )

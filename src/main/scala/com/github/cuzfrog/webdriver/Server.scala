@@ -1,9 +1,6 @@
 package com.github.cuzfrog.webdriver
 
 import akka.actor.ActorSystem
-import spray.httpx.marshalling.ToResponseMarshallable.isMarshallable
-import spray.routing.Directive.pimpApply
-import spray.routing.SimpleRoutingApp
 import spray.http.HttpResponse
 import spray.can.Http
 import spray.http.HttpRequest

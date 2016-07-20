@@ -1,23 +1,26 @@
 package com.github.cuzfrog.webdriver
 
 import com.typesafe.scalalogging.LazyLogging
+import java.nio.ByteBuffer
 
 sealed trait Message { val name = this.getClass.getSimpleName }
 
 object Message extends LazyLogging {
 
-  case class Raw(message: String, data: String) extends Message
+  case class Raw(message: String, data: ByteBuffer) extends Message
   case class StartDriver(driver: String) extends Message
   case class FindElement(attr: String, value: String) extends Message
   case class SendKeys(uuid: String, keys: String) extends Message
+  
+  import boopickle.Default._
+  val pickler = compositePickler[Message]
 
-  def unpickle(in: String): Option[Message] = try {
-    import upickle.default._
-    val raw = read[Raw](in)
+  def unpickle(in: ByteBuffer): Option[Message] = try {
+    val raw = Unpickle[Raw].fromBytes(in)
     val msg = raw.message match {
-      case "StartDriver" => read[StartDriver](raw.data)
-      case "FindElement" => read[FindElement](raw.data)
-      case "SendKeys"    => read[SendKeys](raw.data)
+      case "StartDriver" => Unpickle[StartDriver].fromBytes(raw.data)
+      case "FindElement" => Unpickle[FindElement].fromBytes(raw.data)
+      case "SendKeys"    => Unpickle[SendKeys].fromBytes(raw.data)
     }
     Some(msg)
   } catch {
