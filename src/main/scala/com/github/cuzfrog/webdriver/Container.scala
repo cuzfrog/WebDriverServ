@@ -1,18 +1,16 @@
 package com.github.cuzfrog.webdriver
 
-import java.util.concurrent.CopyOnWriteArrayList
-
-import org.openqa.selenium.{By, WebDriver, WebElement}
-import Elements._
+import com.github.cuzfrog.webdriver.Elements._
+import org.openqa.selenium.{WebDriver, WebElement}
 
 
-sealed trait Container {
+private[webdriver] sealed trait Container {
   val driver: Driver
 }
-case class DriverContainer(driver: Driver, seleniumDriver: WebDriver) extends Container {
+private[webdriver] case class DriverContainer(driver: Driver, seleniumDriver: WebDriver) extends Container {
   val elements = scala.collection.mutable.Seq.empty[Long]
 }
-case class ElementContainer(element: Element, seleniumElement: WebElement) extends Container {
+private[webdriver] case class ElementContainer(element: Element, seleniumElement: WebElement) extends Container {
   val driver = element.driver
 }
-case class WindowContainer(driver: Driver, seleniumDriver: WebDriver, seleniumWindowHandle: String) extends Container
+private[webdriver] case class WindowContainer(driver: Driver, seleniumDriver: WebDriver, seleniumWindowHandle: String) extends Container

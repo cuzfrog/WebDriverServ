@@ -1,8 +1,8 @@
 package com.github.cuzfrog.webdriver
 
-import Elements._
+import com.github.cuzfrog.webdriver.Elements._
 
-object Messages {
+private[webdriver] object Messages {
 
   sealed trait Message
 
@@ -16,6 +16,7 @@ object Messages {
   case class Submit(element: Element) extends Request
   case class Click(element: Element) extends Request
   case class GetAttr(element: Element, attr: String) extends Request
+  case class GetText(element: Element) extends Request
 
   sealed trait Response extends Message
   case class Failed(msg: String) extends Response
@@ -23,6 +24,5 @@ object Messages {
   case class ReadyDriver(driver: Driver) extends Response
   case class ReadyWindow(window: Window) extends Response
   case class ReadyElement(element: Element) extends Response
-  case class Value(value: String) extends Response
 
 }

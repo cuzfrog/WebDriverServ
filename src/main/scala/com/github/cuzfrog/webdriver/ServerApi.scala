@@ -1,18 +1,16 @@
 package com.github.cuzfrog.webdriver
 
 import com.github.cuzfrog.webdriver.Elements.{Element, Frame, Window}
-import org.openqa.selenium.{WebDriver, WebElement}
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
-
-import scala.languageFeature.implicitConversions
+import org.openqa.selenium.{WebDriver, WebElement}
 
 /**
-  * Not thread safe, should be accessed within actor.
+  * Not thread safe, should be accessed within actor. Exceptions are handled in actor.
   */
-object ServerApi {
+private[webdriver] object ServerApi {
 
   import scala.collection.concurrent.TrieMap
 
@@ -20,6 +18,8 @@ object ServerApi {
   private val driverNameIndex = TrieMap.empty[String, Driver]
   private val idGen = new java.util.concurrent.atomic.AtomicLong
   private def newId: Long = idGen.getAndIncrement()
+
+  import scala.language.implicitConversions
 
   implicit def driverConversion(driver: Driver): WebDriver =
     repository(driver._id).asInstanceOf[DriverContainer].seleniumDriver
@@ -36,7 +36,7 @@ object ServerApi {
       case DriverTypes.HtmlUnit => new HtmlUnitDriver()
     }
     val driver = Driver(newId, name)
-    repository.put(driver._id, DriverContainer(webDriver))
+    repository.put(driver._id, DriverContainer(driver, webDriver))
     driverNameIndex.put(name, driver)
     driver
   }
@@ -46,27 +46,24 @@ object ServerApi {
   import Elements.Element
   import org.openqa.selenium.By
 
-  def findElement(id: Long, attr: String, value: String): Option[Element] = {
+  def findElement(id: Long, attr: String, value: String): Element = {
     val by = toBy(attr, value)
-    try {
-      repository.get(id).map { container =>
-        val sEle = container match {
-          case DriverContainer(_, webDriver) => webDriver.findElement(by)
-          case ElementContainer(element, seleniumElement) => element match {
-            case Frame(_, driver) => driver.switchTo().frame(seleniumElement).findElement(by)
-            case _ => seleniumElement.findElement(by)
-          }
-          case WindowContainer(driver, sd, seleniumWindow) => sd.switchTo().window(seleniumWindow).findElement(by)
-        }
-
-        val e = sEle.getTagName.toLowerCase match {
-          case "frame" | "iframe" => Frame(newId, container.driver)
-          case _ => Element(newId,container.driver)
-        }
-        repository.put(e._id, ElementContainer(sEle))
+    val container = repository(id)
+    val sEle = container match {
+      case DriverContainer(_, webDriver) => webDriver.findElement(by)
+      case ElementContainer(el, seleniumElement) => el match {
+        case Frame(_, driver) => driver.switchTo().frame(seleniumElement).findElement(by)
+        case _ => seleniumElement.findElement(by)
       }
-      Some(e)
+      case WindowContainer(driver, sd, seleniumWindow) => sd.switchTo().window(seleniumWindow).findElement(by)
     }
+
+    val element = sEle.getTagName.toLowerCase match {
+      case "frame" | "iframe" => Frame(newId, container.driver)
+      case _ => Element(newId, container.driver)
+    }
+    repository.put(element._id, ElementContainer(element, sEle))
+    element
   }
   private def toBy(attr: String, value: String): By = attr.toLowerCase match {
     case "id" => By.id(value)
@@ -97,4 +94,6 @@ object ServerApi {
     val dc = repository(driver._id).asInstanceOf[DriverContainer]
     clean(dc.elements)
   }
+  def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
+  def getText(element: Element): String = element.getText
 }
