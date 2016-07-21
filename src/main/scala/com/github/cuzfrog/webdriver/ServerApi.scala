@@ -1,13 +1,16 @@
 package com.github.cuzfrog.webdriver
 
-import org.openqa.selenium.WebDriver
+import com.github.cuzfrog.webdriver.Elements.{Element, Frame, Window}
+import org.openqa.selenium.{WebDriver, WebElement}
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
 
+import scala.languageFeature.implicitConversions
+
 /**
-  * Created by scjf on 7/21/2016.
+  * Not thread safe, should be accessed within actor.
   */
 object ServerApi {
 
@@ -18,7 +21,12 @@ object ServerApi {
   private val idGen = new java.util.concurrent.atomic.AtomicLong
   private def newId: Long = idGen.getAndIncrement()
 
-  implicit def driverConversion(driver: Driver): WebDriver = repository(driver.id).asInstanceOf
+  implicit def driverConversion(driver: Driver): WebDriver =
+    repository(driver._id).asInstanceOf[DriverContainer].seleniumDriver
+  implicit def elementConversion(element: Element): WebElement =
+    repository(element._id).asInstanceOf[ElementContainer].seleniumElement
+  implicit def windowConversion(window: Window): String =
+    repository(window._id).asInstanceOf[WindowContainer].seleniumWindowHandle
 
   def newDriver(name: String, typ: DriverTypes.DriverType): Driver = {
     val webDriver = typ match {
@@ -28,7 +36,7 @@ object ServerApi {
       case DriverTypes.HtmlUnit => new HtmlUnitDriver()
     }
     val driver = Driver(newId, name)
-    repository.put(driver.id, DriverContainer(webDriver))
+    repository.put(driver._id, DriverContainer(webDriver))
     driverNameIndex.put(name, driver)
     driver
   }
@@ -36,18 +44,27 @@ object ServerApi {
   def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
   import Elements.Element
-  import org.openqa.selenium.{By, WebDriver}
+  import org.openqa.selenium.By
 
   def findElement(id: Long, attr: String, value: String): Option[Element] = {
     val by = toBy(attr, value)
     try {
-      val sEle = repository.get(id) match {
-        case Some(DriverContainer(webDriver)) => webDriver.findElement(by)
-        case Some(ElementContainer(seleniumElement)) => seleniumElement.findElement(by)
-        case Some(WindowContainer(d, seleniumWindow)) => d.switchTo().window(seleniumWindow).findElement(by)
+      repository.get(id).map { container =>
+        val sEle = container match {
+          case DriverContainer(_, webDriver) => webDriver.findElement(by)
+          case ElementContainer(element, seleniumElement) => element match {
+            case Frame(_, driver) => driver.switchTo().frame(seleniumElement).findElement(by)
+            case _ => seleniumElement.findElement(by)
+          }
+          case WindowContainer(driver, sd, seleniumWindow) => sd.switchTo().window(seleniumWindow).findElement(by)
+        }
+
+        val e = sEle.getTagName.toLowerCase match {
+          case "frame" | "iframe" => Frame(newId, container.driver)
+          case _ => Element(newId,container.driver)
+        }
+        repository.put(e._id, ElementContainer(sEle))
       }
-      val e = Element(newId)
-      repository.put(e.id, ElementContainer(sEle))
       Some(e)
     }
   }
@@ -60,5 +77,24 @@ object ServerApi {
     case "css" | "cssselector" => By.cssSelector(value)
     case "link" | "linktext" => By.linkText(value)
     case "partiallink" | "partiallinktext" => By.partialLinkText(value)
+  }
+
+  def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
+  def submit(element: Element) = element.submit()
+  def click(element: Element) = element.click()
+  def kill(driver: Driver): Long = {
+    val dc = repository(driver._id).asInstanceOf[DriverContainer]
+    dc.seleniumDriver.quit()
+    driverNameIndex.remove(driver.name)
+    repository.remove(driver._id)
+    clean(dc.elements)
+  }
+  private def clean(elements: Seq[Long]): Long = {
+    elements.foreach(repository.remove)
+    elements.length
+  }
+  def clean(driver: Driver) = {
+    val dc = repository(driver._id).asInstanceOf[DriverContainer]
+    clean(dc.elements)
   }
 }
