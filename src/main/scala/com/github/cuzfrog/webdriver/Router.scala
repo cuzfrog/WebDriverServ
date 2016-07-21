@@ -3,31 +3,34 @@ package com.github.cuzfrog.webdriver
 import java.nio.ByteBuffer
 
 import boopickle.Default._
-import Messages._
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.htmlunit.HtmlUnitDriver
-import org.openqa.selenium.ie.InternetExplorerDriver
-import Server.drivers
+import com.github.cuzfrog.webdriver.Messages._
 
 object Router {
+
   def response(msg: Array[Byte]): Array[Byte] = {
-    val responseData = Unpickle[Message].fromBytes(ByteBuffer.wrap(msg)) match {
-      case NewDriver(name, typ) => {
-        val webDriver = typ match {
-          case DriverTypes.IE => new InternetExplorerDriver()
-          case DriverTypes.Chrome => new ChromeDriver()
-          case DriverTypes.FireFox => new FirefoxDriver()
-          case DriverTypes.HtmlUnit => new HtmlUnitDriver()
-        }
-        drivers.put(name, webDriver)
-        ReadyDriver(Driver(name))
-      }
-      case RetrieveDriver(name) => drivers.get(name) match {
-        case Some(d) => ReadyDriver(Driver(name))
+    val response = try {
+      routeMessage(Unpickle[Request].fromBytes(ByteBuffer.wrap(msg)))
+    } catch {
+      case e: Exception => Failed(e.getMessage)
+    }
+    Pickle.intoBytes(response).array()
+  }
+
+
+  private def routeMessage(request: Request): Response = {
+    implicit def extractDriverName(driver: Driver): String = driver.name
+
+    request match {
+      case NewDriver(name, typ) => ReadyDriver(ServerApi.newDriver(name, typ))
+      case RetrieveDriver(name) => ServerApi.retrieveDriver(name) match {
+        case Some(d) => ReadyDriver(d)
         case None => Failed(s"No such driver[$name] on server.")
       }
+      case FindElement(id, attr, value) => ServerApi.findElement(id, attr, value) match {
+        case Some(d) => ReadyElement(d)
+        case None => Failed(s"Cannot find element[attr:$attr|value:$value].")
+      }
     }
-    Pickle.intoBytes(responseData).array()
   }
+
 }

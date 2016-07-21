@@ -1,25 +1,21 @@
 package com.github.cuzfrog.webdriver
 
-import akka.actor.ActorSystem
-import spray.http.HttpResponse
-import spray.can.Http
-import spray.http.HttpRequest
-import akka.actor.Props
-import akka.actor.Actor
-import spray.http.Uri
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.io.IO
-import org.openqa.selenium.WebDriver
-import spray.http.HttpMethods
+import spray.can.Http
+import spray.http.{HttpMethods, HttpRequest, HttpResponse, Uri}
+
 
 object Server extends App {
   System.setProperty("webdriver.ie.driver", "C:/program1/Selenium/IEDriverServer.exe")
 
-  lazy val drivers = scala.collection.concurrent.TrieMap.empty[String, WebDriver]
-
   implicit lazy val system = ActorSystem("WebDriverServ")
   lazy val handler = system.actorOf(Props[Service], name = "handler")
   IO(Http) ! Http.Bind(handler, interface = "localhost", port = 90001)
+
 }
+
+
 
 class Service extends Actor {
   def receive = {

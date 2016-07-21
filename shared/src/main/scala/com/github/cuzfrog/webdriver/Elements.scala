@@ -2,9 +2,10 @@ package com.github.cuzfrog.webdriver
 
 object Elements {
 
-  case class Element(attr: Map[String, String])
-  case class Frame(override val attr: Map[String, String]) extends Element(attr) with WindowAlike
+  case class Element(id: Long)
+  case class Frame(override val id: Long)
+    extends Element(id) with WindowAlike
 
   sealed trait WindowAlike
-  case class Window(head: String, title: String) extends WindowAlike
+  case class Window(id: Long, driver: Driver, head: String, title: String) extends WindowAlike
 }

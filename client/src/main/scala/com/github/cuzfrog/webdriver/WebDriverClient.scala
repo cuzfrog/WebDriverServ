@@ -6,13 +6,13 @@ import akka.actor.ActorSystem
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
+import boopickle.Default._
 import spray.can.Http
 import spray.http._
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
-import boopickle.Default._
 
 object WebDriverClient {
 
