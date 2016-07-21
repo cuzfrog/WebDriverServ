@@ -22,11 +22,11 @@ object WebDriverClient {
 
   def create(name: String, host: String, typ: DriverTypes.DriverType): Driver = ask(NewDriver(name,typ))(host)
 
-  implicit val system: ActorSystem = ActorSystem("WebDriverCli")
-  implicit val timeout: Timeout = Timeout(15 seconds)
+  private[webdriver] implicit val system: ActorSystem = ActorSystem("WebDriverCli")
+  private[webdriver] implicit val timeout: Timeout = Timeout(15 seconds)
 
   // implicit execution context
-  private def ask[T](message: Messages.Message)(implicit host: String): T =try {
+  private[webdriver] def ask[T](message: Messages.Message)(implicit host: String): T =try {
     val data = Pickle.intoBytes(message)
     val response=(IO(Http) ? HttpRequest(method = HttpMethods.POST, uri = Uri(s"$host/tell"), entity = HttpEntity(data.array()))).mapTo[HttpResponse]
     val result = Await.result(response, 15 seconds)

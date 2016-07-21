@@ -7,5 +7,5 @@ object Elements {
     extends Element(_id, driver) with WindowAlike
 
   sealed trait WindowAlike
-  case class Window(_id: Long, driver: Driver, head: String, title: String) extends WindowAlike
+  case class Window(_id: Long, driver: Driver, handle: String, title: String) extends WindowAlike
 }

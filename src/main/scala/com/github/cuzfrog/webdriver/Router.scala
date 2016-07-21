@@ -25,6 +25,7 @@ private[webdriver] class Router extends Actor {
       case Click(element) => ServerApi.click(element); Success("Clicked")
       case GetAttr(element: Element, attr: String) => Success(ServerApi.getAttr(element, attr))
       case GetText(element) => Success(ServerApi.getText(element))
+      case GetWindow(driver)=> ReadyWindow(ServerApi.getWindow(driver))
     }
   } catch {
     case e: Exception => Failed(e.getMessage)
