@@ -1,6 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import com.github.cuzfrog.webdriver.Elements._
 import org.openqa.selenium.{WebDriver, WebElement}
 
 private[webdriver] sealed trait Container {

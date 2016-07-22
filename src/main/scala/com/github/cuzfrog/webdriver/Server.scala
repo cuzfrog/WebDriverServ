@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.io.IO
 import boopickle.Default._
-import com.github.cuzfrog.webdriver.Messages.{Failed, Request, Response}
+import com.github.cuzfrog.webdriver.Messages.{Failed, Request}
 import spray.can.Http
 import spray.http.{HttpMethods, HttpRequest, HttpResponse, Uri}
 

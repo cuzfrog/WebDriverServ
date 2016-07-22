@@ -1,7 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import Elements._
-
 case class Driver(_id: Long, name: String) {
 
   def getWindows: Seq[Window] = ???
@@ -14,6 +12,7 @@ case class Driver(_id: Long, name: String) {
   def kill(): Unit = ???
   /**
     * Clean all associated elements in repository
+ *
     * @return number of elements cleaned.
     */
   def clean(): Long = ???

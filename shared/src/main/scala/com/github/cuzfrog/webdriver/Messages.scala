@@ -1,7 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import com.github.cuzfrog.webdriver.Elements._
-
 
 /**
   * Interact with api, working as router.

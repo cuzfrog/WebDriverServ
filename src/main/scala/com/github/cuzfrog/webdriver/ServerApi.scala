@@ -1,6 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import com.github.cuzfrog.webdriver.Elements.{Element, Frame, Window}
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
@@ -59,9 +58,6 @@ private[webdriver] object ServerApi extends Api {
   }
 
   def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
-
-  import Elements.Element
-
 
   def findElement(id: Long, attr: String, value: String): Element = {
     val by = toBy(attr, value)
