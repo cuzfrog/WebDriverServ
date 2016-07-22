@@ -2,6 +2,10 @@ package com.github.cuzfrog.webdriver
 
 import com.github.cuzfrog.webdriver.Elements._
 
+
+/**
+  * Interact with api, working as router.
+  */
 private[webdriver] object Messages {
 
   sealed trait Message
@@ -34,23 +38,23 @@ private[webdriver] object Messages {
     def execute(api: Api) = ReadyElement(api.findElement(parent_id, attr, value))
   }
   case class FindElements(parent_id: Long, attr: String, value: String) extends Request {
-    def execute(api: Api) = ???
+    def execute(api: Api) = ReadyElements(api.findElements(parent_id, attr, value))
   }
   case class SendKeys(element: Element, keys: String) extends Request {
     def execute(api: Api) = {
-      api.sendKeys(element, keys);
+      api.sendKeys(element, keys)
       Success("Keys sent.")
     }
   }
   case class Submit(element: Element) extends Request {
     def execute(api: Api) = {
-      api.submit(element);
+      api.submit(element)
       Success("Submit")
     }
   }
   case class Click(element: Element) extends Request {
     def execute(api: Api) = {
-      api.click(element);
+      api.click(element)
       Success("Clicked")
     }
   }
@@ -64,7 +68,7 @@ private[webdriver] object Messages {
     def execute(api: Api) = ReadyWindow(api.getWindow(driver))
   }
   case class GetWindows(driver: Driver) extends Request {
-    def execute(api: Api) =
+    def execute(api: Api) = ReadyWindows(api.getWindows(driver))
   }
 
   sealed trait Response extends Message

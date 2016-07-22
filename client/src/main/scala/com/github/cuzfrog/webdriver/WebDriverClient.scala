@@ -30,7 +30,6 @@ object WebDriverClient {
     val data = Pickle.intoBytes(message)
     val response=(IO(Http) ? HttpRequest(method = HttpMethods.POST, uri = Uri(s"$host/tell"), entity = HttpEntity(data.array()))).mapTo[HttpResponse]
     val result = Await.result(response, 15 seconds)
-    implicit def arrToBuf(arr: Array[Byte]): ByteBuffer = ByteBuffer.wrap(arr)
-    Unpickle[T].fromBytes(result.entity.data.toByteArray)
+    Unpickle[T].fromBytes(ByteBuffer.wrap(result.entity.data.toByteArray))
   }
 }

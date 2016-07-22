@@ -83,7 +83,7 @@ private[webdriver] object ServerApi extends Api {
     getDriverContainer(container.driver).elements += element._id
     element
   }
-
+  def findElements(id: Long, attr: String, value: String): Seq[Element] = ???
 
   def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
   def submit(element: Element) = element.submit()
