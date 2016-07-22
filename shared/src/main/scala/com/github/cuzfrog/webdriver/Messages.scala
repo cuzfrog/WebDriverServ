@@ -12,11 +12,11 @@ private[webdriver] object Messages {
     def execute(api: Api): Response
   }
   case class NewDriver(name: String, typ: DriverTypes.DriverType) extends Request {
-    def execute(api: Api) = ReadyDriver(api.newDriver(name, typ))
+    def execute(api: Api) = Ready[Driver](api.newDriver(name, typ))
   }
   case class RetrieveDriver(name: String) extends Request {
     def execute(api: Api) = api.retrieveDriver(name) match {
-      case Some(d) => ReadyDriver(d)
+      case Some(d) => Ready[Driver](d)
       case None => Failed(s"No such driver[$name] on server.")
     }
   }
@@ -32,11 +32,17 @@ private[webdriver] object Messages {
       Success(s"$eleCnt elements cleaned.")
     }
   }
+  case class GetWindow(driver: Driver) extends Request {
+    def execute(api: Api) = Ready[Window](api.getWindow(driver))
+  }
+  case class GetWindows(driver: Driver) extends Request {
+    def execute(api: Api) = Ready[Seq[Window]](api.getWindows(driver))
+  }
   case class FindElement(parent_id: Long, attr: String, value: String) extends Request {
-    def execute(api: Api) = ReadyElement(api.findElement(parent_id, attr, value))
+    def execute(api: Api) = Ready[Element](api.findElement(parent_id, attr, value))
   }
   case class FindElements(parent_id: Long, attr: String, value: String) extends Request {
-    def execute(api: Api) = ReadyElements(api.findElements(parent_id, attr, value))
+    def execute(api: Api) = Ready[Seq[Element]](api.findElements(parent_id, attr, value))
   }
   case class SendKeys(element: Element, keys: String) extends Request {
     def execute(api: Api) = {
@@ -62,20 +68,16 @@ private[webdriver] object Messages {
   case class GetText(element: Element) extends Request {
     def execute(api: Api) = Success(api.getText(element))
   }
-  case class GetWindow(driver: Driver) extends Request {
-    def execute(api: Api) = ReadyWindow(api.getWindow(driver))
-  }
-  case class GetWindows(driver: Driver) extends Request {
-    def execute(api: Api) = ReadyWindows(api.getWindows(driver))
-  }
+
 
   sealed trait Response extends Message
   case class Failed(msg: String) extends Response
   case class Success(msg: String) extends Response
-  case class ReadyDriver(driver: Driver) extends Response
-  case class ReadyWindow(window: Window) extends Response
-  case class ReadyWindows(windows: Seq[Window]) extends Response
-  case class ReadyElement(element: Element) extends Response
-  case class ReadyElements(elements: Seq[Element]) extends Response
+  case class Ready[T](data: T) extends Response
+  //  case class ReadyDriver(driver: Driver) extends Response
+  //  case class ReadyWindow(window: Window) extends Response
+  //  case class ReadyWindows(windows: Seq[Window]) extends Response
+  //  case class ReadyElement(element: Element) extends Response
+  //  case class ReadyElements(elements: Seq[Element]) extends Response
 
 }
