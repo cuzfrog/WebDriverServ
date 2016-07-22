@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Not thread safe, should be accessed within actor. Exceptions are handled in actor.
   */
-private[webdriver] object ServerApi {
+private[webdriver] object ServerApi extends Api {
 
   import scala.collection.concurrent.TrieMap
 
@@ -31,6 +31,20 @@ private[webdriver] object ServerApi {
     repository(window._id).asInstanceOf[WindowContainer].window.handle
   private def getDriverContainer(driver: Driver): DriverContainer = repository(driver._id).asInstanceOf[DriverContainer]
 
+  import org.openqa.selenium.By
+
+  private def toBy(attr: String, value: String): By = attr.toLowerCase match {
+    case "id" => By.id(value)
+    case "name" => By.name(value)
+    case "tag" | "tagname" => By.tagName(value)
+    case "xpath" => By.xpath(value)
+    case "class" | "classname" => By.className(value)
+    case "css" | "cssselector" => By.cssSelector(value)
+    case "link" | "linktext" => By.linkText(value)
+    case "partiallink" | "partiallinktext" => By.partialLinkText(value)
+  }
+
+
   def newDriver(name: String, typ: DriverTypes.DriverType): Driver = {
     val webDriver = typ match {
       case DriverTypes.IE => new InternetExplorerDriver()
@@ -47,7 +61,7 @@ private[webdriver] object ServerApi {
   def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
   import Elements.Element
-  import org.openqa.selenium.By
+
 
   def findElement(id: Long, attr: String, value: String): Element = {
     val by = toBy(attr, value)
@@ -69,16 +83,7 @@ private[webdriver] object ServerApi {
     getDriverContainer(container.driver).elements += element._id
     element
   }
-  private def toBy(attr: String, value: String): By = attr.toLowerCase match {
-    case "id" => By.id(value)
-    case "name" => By.name(value)
-    case "tag" | "tagname" => By.tagName(value)
-    case "xpath" => By.xpath(value)
-    case "class" | "classname" => By.className(value)
-    case "css" | "cssselector" => By.cssSelector(value)
-    case "link" | "linktext" => By.linkText(value)
-    case "partiallink" | "partiallinktext" => By.partialLinkText(value)
-  }
+
 
   def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
   def submit(element: Element) = element.submit()

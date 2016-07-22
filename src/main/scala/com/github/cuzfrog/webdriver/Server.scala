@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.io.IO
 import boopickle.Default._
-import com.github.cuzfrog.webdriver.Messages.{Request, Response}
+import com.github.cuzfrog.webdriver.Messages.{Failed, Request, Response}
 import spray.can.Http
 import spray.http.{HttpMethods, HttpRequest, HttpResponse, Uri}
 
@@ -29,12 +29,14 @@ private[webdriver] object Server extends App {
 }
 
 private[webdriver] class Service extends Actor {
-  private lazy val router = context.system.actorOf(Props[Router], name = "router")
-
   def receive = {
     case HttpRequest(HttpMethods.GET, Uri.Path("/tell"), _, entity, _) =>
-      router ! Unpickle[Request].fromBytes(ByteBuffer.wrap(entity.data.toByteArray))
-    case r: Response =>
-      sender() ! HttpResponse(entity = Pickle.intoBytes(r).array())
+      val request = Unpickle[Request].fromBytes(ByteBuffer.wrap(entity.data.toByteArray))
+      val response = try {
+        request.execute(ServerApi)
+      } catch {
+        case e: Exception => Failed(e.getMessage)
+      }
+      sender ! HttpResponse(entity = Pickle.intoBytes(response).array())
   }
 }
