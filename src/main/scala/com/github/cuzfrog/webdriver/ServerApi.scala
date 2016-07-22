@@ -6,6 +6,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
 import org.openqa.selenium.{WebDriver, WebElement}
 
+import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -59,27 +60,33 @@ private[webdriver] object ServerApi extends Api {
 
   def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
-  def findElement(id: Long, attr: String, value: String): Element = {
+
+  def findElement(id: Long, attr: String, value: String): Element =
+    findElements(id, attr, value).head
+  def findElements(id: Long, attr: String, value: String): Seq[Element] = {
     val by = toBy(attr, value)
     val container = repository(id)
-    val sEle = container match {
-      case DriverContainer(_, webDriver) => webDriver.findElement(by)
+    val sEles = container match {
+      case DriverContainer(_, webDriver) => webDriver.findElements(by)
       case ElementContainer(el, seleniumElement) => el match {
-        case Frame(_, driver) => driver.switchTo().frame(seleniumElement).findElement(by)
-        case _ => seleniumElement.findElement(by)
+        case Frame(_, driver) => driver.switchTo().frame(seleniumElement).findElements(by)
+        case _ => seleniumElement.findElements(by)
       }
-      case WindowContainer(window, sd) => sd.switchTo().window(window.handle).findElement(by)
+      case WindowContainer(window, sd) => sd.switchTo().window(window.handle).findElements(by)
     }
 
-    val element = sEle.getTagName.toLowerCase match {
-      case "frame" | "iframe" => Frame(newId, container.driver)
-      case _ => Element(newId, container.driver)
+
+    val elements = sEles.map { sEle =>
+      val ele = sEle.getTagName.toLowerCase match {
+        case "frame" | "iframe" => Frame(newId, container.driver)
+        case _ => Element(newId, container.driver)
+      }
+      repository.put(ele._id, ElementContainer(ele, sEle))
+      getDriverContainer(container.driver).elements += ele._id
+      ele
     }
-    repository.put(element._id, ElementContainer(element, sEle))
-    getDriverContainer(container.driver).elements += element._id
-    element
+    elements.toList
   }
-  def findElements(id: Long, attr: String, value: String): Seq[Element] = ???
 
   def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
   def submit(element: Element) = element.submit()
@@ -108,12 +115,22 @@ private[webdriver] object ServerApi extends Api {
     val dc = getDriverContainer(driver)
     val webDriver = dc.seleniumDriver
     val windowHandle = webDriver.getWindowHandle
+    createRegisterWindow(dc, driver, webDriver, windowHandle)
+  }
+  def getWindows(driver: Driver): Seq[Window] = {
+    val dc = getDriverContainer(driver)
+    val webDriver = dc.seleniumDriver
+    val windowHandles = webDriver.getWindowHandles
+    windowHandles.map { windowHandle =>
+      createRegisterWindow(dc, driver, webDriver, windowHandle)
+    }.toList
+  }
+  private def createRegisterWindow(dc: DriverContainer, driver: Driver, webDriver: WebDriver, windowHandle: String) = {
     webDriver.switchTo().window(windowHandle)
     val window = Window(newId, driver, windowHandle, webDriver.getTitle)
     repository.put(window._id, WindowContainer(window, webDriver))
     dc.elements += window._id
     window
   }
-  def getWindows(driver: Driver): Seq[Window] = ???
 
 }

@@ -1,14 +1,13 @@
 package com.github.cuzfrog.webdriver
 
-import com.github.cuzfrog.webdriver.Elements.{Element, Window}
-
 /**
-  * Created by scjf on 7/22/2016.
+  * Shared Api.
   */
 private[webdriver] trait Api {
   def newDriver(name: String, typ: DriverTypes.DriverType): Driver
   def retrieveDriver(name: String): Option[Driver]
   def findElement(id: Long, attr: String, value: String): Element
+  def findElements(id: Long, attr: String, value: String): Seq[Element]
   def sendKeys(element: Element, keys: String): Unit
   def submit(element: Element): Unit
   def click(element: Element): Unit
