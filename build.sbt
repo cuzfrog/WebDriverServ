@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "ch.qos.logback" % "logback-classic" % "1.1.3"
 )
-mainClass in reStart := Some("com.github.cuzfrog.spatest.Server")
+mainClass in reStart := Some("com.github.cuzfrog.webdriver.Server")
 
 lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
@@ -51,3 +51,5 @@ lazy val shared = (project in file("./shared")).disablePlugins(RevolverPlugin)
 EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.ManagedClasses
 EclipseKeys.withSource := true
 EclipseKeys.withJavadoc := true
+
+addCommandAlias("change",";re-stop;re-start")

@@ -2,7 +2,6 @@ package com.github.cuzfrog.webdriver
 
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.htmlunit.HtmlUnitDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
 import org.openqa.selenium.{WebDriver, WebElement}
 
@@ -50,7 +49,7 @@ private[webdriver] object ServerApi extends Api {
       case DriverTypes.IE => new InternetExplorerDriver()
       case DriverTypes.Chrome => new ChromeDriver()
       case DriverTypes.FireFox => new FirefoxDriver()
-      case DriverTypes.HtmlUnit => new HtmlUnitDriver()
+      case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic") //new HtmlUnitDriver()
     }
     val driver = Driver(newId, name)
     repository.put(driver._id, DriverContainer(driver, webDriver))
@@ -79,7 +78,7 @@ private[webdriver] object ServerApi extends Api {
     val elements = sEles.map { sEle =>
       val ele = sEle.getTagName.toLowerCase match {
         case "frame" | "iframe" => Frame(newId, container.driver)
-        case _ => Element(newId, container.driver)
+        case _ => CommonElement(newId, container.driver)
       }
       repository.put(ele._id, ElementContainer(ele, sEle))
       getDriverContainer(container.driver).elements += ele._id

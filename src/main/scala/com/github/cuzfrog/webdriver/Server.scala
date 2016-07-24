@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import akka.actor.{Actor, ActorSystem, Props, Terminated}
 import akka.io.IO
 import boopickle.Default._
-import com.github.cuzfrog.webdriver.Messages.{Failed, Request}
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import spray.can.Http
 import spray.http.{HttpMethods, HttpRequest, HttpResponse, Uri}
@@ -15,30 +15,22 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 private[webdriver] object Server extends App with LazyLogging {
-  private val hostExtractor = "-host=([\d\w\\.]+)".r
-  private val host = args.find(_.startsWith("-host=")) match {
-    case Some(hostExtractor(h)) => h
-    case _ => "localhost"
-  }
-  private val portExtractor = "-port=([\d]+)".r
-  private val port = args.find(_.startsWith("-port=")) match {
-    case Some(portExtractor(h)) => h.toInt
-    case _ => 90001
-  }
+  System.setProperty("config.file","./application.conf")
+  val config=ConfigFactory.load()
 
   private implicit lazy val system = ActorSystem("WebDriverServ")
   private lazy val handler = system.actorOf(Props[Service], name = "handler")
 
-  IO(Http) ! Http.Bind(handler, interface = host, port = port)
+  IO(Http) ! Http.Bind(handler, interface = config.getString("host"), port = config.getInt("port"))
 
-  while(true){
-    scala.io.StdIn.readLine().toLowerCase() match{
-      case "exit" | "quit" |"shutdown" => shutdown()
+  while (true) {
+    scala.io.StdIn.readLine().toLowerCase() match {
+      case "exit" | "quit" | "shutdown" => shutdown()
       case _ => //do nothing.
     }
   }
 
-  private[webdriver] def shutdown():Unit={
+  private[webdriver] def shutdown(): Unit = {
     IO(Http) ! Http.Unbind
     val terminated = system.terminate()
     val f = new PartialFunction[Terminated, Unit] {
@@ -47,19 +39,30 @@ private[webdriver] object Server extends App with LazyLogging {
     }
     import system.dispatcher
     terminated.onSuccess(f)
-    Await.result(terminated,15 seconds)
+    Await.result(terminated, 15 seconds)
   }
 }
 
 private[webdriver] class Service extends Actor {
+  implicit val bodyPickler = compositePickler[Response]
+    .addConcreteType[Failed]
+    .addConcreteType[Success]
+    .addConcreteType[Ready[Window]]
+    .addConcreteType[Ready[Seq[Window]]]
+    .addConcreteType[Ready[Element]]
+    .addConcreteType[Ready[Seq[Element]]]
+    .addConcreteType[Ready[Driver]]
+
   def receive = {
     case HttpRequest(HttpMethods.GET, Uri.Path("/tell"), _, entity, _) =>
       val request = Unpickle[Request].fromBytes(ByteBuffer.wrap(entity.data.toByteArray))
-      val response = try {
+      val response: Response = try {
         request.execute(ServerApi)
       } catch {
         case e: Exception => Failed(e.getMessage)
       }
-      sender ! HttpResponse(entity = Pickle.intoBytes(response).array())
+      val arr = Array.emptyByteArray
+      Pickle.intoBytes(response).get(arr)
+      sender ! HttpResponse(entity = arr)
   }
 }

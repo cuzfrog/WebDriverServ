@@ -1,6 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import com.github.cuzfrog.webdriver.Messages._
 import com.github.cuzfrog.webdriver.WebDriverClient.ask
 import com.typesafe.scalalogging.LazyLogging
 
@@ -8,22 +7,22 @@ trait AddClientMethod extends LazyLogging {
   /**
     * Create a driver instance on the server and return a stub for manipulation.
     *
-    * @param host uri of the host, example: http://localhost:90001
+    * @param host url of the host, example: http://localhost:9000
     * @param name to give the driver a name, so that it can be easily remembered or retrieved next run time.
     * @param typ  driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
   def newDriver(host: String, name: String, typ: DriverTypes.DriverType): Option[ClientDriver] =
-    ask[Ready[Driver]](NewDriver(name, typ))(host).map(r => ClientDriver(r.data, host))
+    ask(NewDriver(name, typ))(host) collect { case r: Ready[Driver] => ClientDriver(r.data, host) }
   /**
     * Retrieve the stub of the driver instance from the server.
     *
-    * @param host uri of the host, example: http://localhost:90001
+    * @param host url of the host, example: http://localhost:90001
     * @param name the name of the driver.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
   def retrieveDriver(host: String, name: String): Option[ClientDriver] =
-    ask[Ready[Driver]](RetrieveDriver(name))(host).map(r => ClientDriver(r.data, host))
+    ask(RetrieveDriver(name))(host).map{case r:Ready[Driver] => ClientDriver(r.data, host)}
 
   /**
     * Send shutdown command to the server.
@@ -64,7 +63,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
 }
 trait FindElementMethod {
   protected val _id: Long
-  protected val host: String
+  protected implicit val host: String
   /**
     * Invoke FindElement on the server and return a stub of an element.
     * If this element is a frame, methods are invoked after an automatic driver switch.
@@ -98,7 +97,7 @@ case class ClientWindow(window: Window, host: String) extends FindElementMethod 
   protected val _id = window._id
 }
 
-case class ClientElement(element: Element, host: String) extends FindElementMethod with LazyLogging {
+case class ClientElement(element: Element, implicit val host: String) extends FindElementMethod with LazyLogging {
   protected val _id = element._id
 
   /**
