@@ -4,6 +4,34 @@ import com.github.cuzfrog.webdriver.Messages._
 import com.github.cuzfrog.webdriver.WebDriverClient.ask
 import com.typesafe.scalalogging.LazyLogging
 
+trait AddClientMethod extends LazyLogging {
+  /**
+    * Create a driver instance on the server and return a stub for manipulation.
+    *
+    * @param host uri of the host, example: http://localhost:90001
+    * @param name to give the driver a name, so that it can be easily remembered or retrieved next run time.
+    * @param typ  driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
+    * @return An Option of a client side driver class with necessary identification and interaction methods.
+    */
+  def newDriver(host: String, name: String, typ: DriverTypes.DriverType): Option[ClientDriver] =
+    ask[Ready[Driver]](NewDriver(name, typ))(host).map(r => ClientDriver(r.data, host))
+  /**
+    * Retrieve the stub of the driver instance from the server.
+    *
+    * @param host uri of the host, example: http://localhost:90001
+    * @param name the name of the driver.
+    * @return An Option of a client side driver class with necessary identification and interaction methods.
+    */
+  def retrieveDriver(host: String, name: String): Option[ClientDriver] =
+    ask[Ready[Driver]](RetrieveDriver(name))(host).map(r => ClientDriver(r.data, host))
+
+  /**
+    * Send shutdown command to the server.
+    *
+    * @param host uri of the server.
+    */
+  def shutdownServer(host: String): Unit = ask[Success](Shutdown)(host).foreach(f => logger.trace(f.msg))
+}
 
 case class ClientDriver(driver: Driver, private implicit val host: String) extends LazyLogging {
   val name = driver.name
@@ -26,13 +54,13 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
   /**
     * Kill driver on the server, and clean all associated elements in repository. Aka invoke WebDriver.quit().
     */
-  def kill(): Unit = ask[Success](Kill(driver)).foreach(f => logger.debug(f.msg))
+  def kill(): Unit = ask[Success](Kill(driver)).foreach(f => logger.trace(f.msg))
   /**
     * Clean all associated elements in server repository.
     *
     * @return number of elements cleaned.
     */
-  def clean(): Unit = ask[Success](Clean(driver)).foreach(f => logger.debug(f.msg))
+  def clean(): Unit = ask[Success](Clean(driver)).foreach(f => logger.trace(f.msg))
 }
 trait FindElementMethod {
   protected val _id: Long
@@ -40,7 +68,8 @@ trait FindElementMethod {
   /**
     * Invoke FindElement on the server and return a stub of an element.
     * If this element is a frame, methods are invoked after an automatic driver switch.
-    * @param attr which includes:id, name, tag, xpath, class/className, css/cssSelector, link and partialLink. Case insensitive.
+    *
+    * @param attr  which includes:id, name, tag, xpath, class/className, css/cssSelector, link and partialLink. Case insensitive.
     * @param value of the attr.
     * @return An Option of an element.
     */
@@ -48,7 +77,8 @@ trait FindElementMethod {
     ask[Ready[Element]](FindElement(_id, attr, value)).map(r => ClientElement(r.data, host))
   /**
     * Invoke associated method on the server and return a sequence of stubs.
-    * @param attr which includes:id, name, tag, xpath, class/className, css/cssSelector, link and partialLink. Case insensitive.
+    *
+    * @param attr  which includes:id, name, tag, xpath, class/className, css/cssSelector, link and partialLink. Case insensitive.
     * @param value of the attr.
     * @return An Seq of elements, when empty it be Nil.
     */
@@ -73,17 +103,16 @@ case class ClientElement(element: Element, host: String) extends FindElementMeth
 
   /**
     * Send keys to the element. May fail.
-    * @param keys
     */
-  def sendKeys(keys: String): Unit = ask[Success](SendKeys(element, keys)).foreach(f => logger.debug(f.msg))
+  def sendKeys(keys: String): Unit = ask[Success](SendKeys(element, keys)).foreach(f => logger.trace(f.msg))
   /**
     * If this causes a web reload or refresh, reference to elements before this invocation will be invalid.
     */
-  def submit(): Unit = ask[Success](Submit(element)).foreach(f => logger.debug(f.msg))
+  def submit(): Unit = ask[Success](Submit(element)).foreach(f => logger.trace(f.msg))
   /**
     * If this causes a web reload or refresh, reference to elements before this invocation will be invalid.
     */
-  def click(): Unit = ask[Success](Click(element)).foreach(f => logger.debug(f.msg))
+  def click(): Unit = ask[Success](Click(element)).foreach(f => logger.trace(f.msg))
   /**
     * Get value of the attribute.
     */
@@ -91,7 +120,9 @@ case class ClientElement(element: Element, host: String) extends FindElementMeth
   /**
     * Get text of this element.
     */
-  def getText:Option[String] = ask[Success](GetText(element)).map(_.msg)
+  def getText: Option[String] = ask[Success](GetText(element)).map(_.msg)
 
 }
+
+
 

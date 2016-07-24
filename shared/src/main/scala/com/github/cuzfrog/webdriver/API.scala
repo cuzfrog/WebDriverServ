@@ -17,4 +17,5 @@ private[webdriver] trait Api {
   def getText(element: Element): String
   def getWindow(driver: Driver): Window
   def getWindows(driver: Driver): Seq[Window]
+  def shutdown(): Unit
 }

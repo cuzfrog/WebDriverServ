@@ -1,6 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-
 /**
   * Interact with api, working as router.
   */
@@ -68,11 +67,17 @@ private[webdriver] object Messages {
   case class GetText(element: Element) extends Request {
     def execute(api: Api) = Success(api.getText(element))
   }
-
+  case object Shutdown extends Request {
+    def execute(api: Api) = {
+      api.shutdown()
+      Success("Server shutdown.")
+    }
+  }
 
   sealed trait Response extends Message
   case class Failed(msg: String) extends Response
   case class Success(msg: String) extends Response
+  case class Result(isSuccessful: Boolean, msg: String) extends Response
   case class Ready[T](data: T) extends Response
   //  case class ReadyDriver(driver: Driver) extends Response
   //  case class ReadyWindow(window: Window) extends Response

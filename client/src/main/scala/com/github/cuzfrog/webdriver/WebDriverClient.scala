@@ -16,25 +16,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 
-object WebDriverClient extends LazyLogging {
+object WebDriverClient extends AddClientMethod with LazyLogging {
 
-  /**
-    * Create a driver instance on the server and return a stub for manipulation.
-    * @param host uri of the host, example: http://localhost:90001
-    * @param name to give the driver a name, so that it can be easily remembered or retrieved next run time.
-    * @param typ driver's type. See Selenium WebDriver's document. {@see DriverTypes.DriverType}
-    * @return An Option of a client side driver class with necessary identification and interaction methods.
-    */
-  def newDriver(host: String, name: String, typ: DriverTypes.DriverType): Option[ClientDriver] =
-    ask[Ready[Driver]](NewDriver(name, typ))(host).map(r => ClientDriver(r.data, host))
-  /**
-    * Retrieve the stub of the driver instance from the server.
-    * @param host uri of the host, example: http://localhost:90001
-    * @param name the name of the driver.
-    * @return An Option of a client side driver class with necessary identification and interaction methods.
-    */
-  def retrieveDriver(host: String, name: String): Option[ClientDriver] =
-    ask[Ready[Driver]](RetrieveDriver(name))(host).map(r => ClientDriver(r.data, host))
+
 
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(15 seconds)
@@ -46,7 +30,7 @@ object WebDriverClient extends LazyLogging {
     val result = Await.result(httpResponse, 15 seconds)
     val response = Unpickle[T].fromBytes(ByteBuffer.wrap(result.entity.data.toByteArray))
     response match {
-      case Failed(msg) => logger.debug(s"Server: failed-$msg"); None
+      case Result(false, msg) => logger.debug(s"Server: failed-$msg"); None
       case _ => Some(response)
     }
 

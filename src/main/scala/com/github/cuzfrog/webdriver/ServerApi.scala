@@ -133,4 +133,7 @@ private[webdriver] object ServerApi extends Api {
     window
   }
 
+  def shutdown()={
+    Server.shutdown()
+  }
 }

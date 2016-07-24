@@ -45,9 +45,8 @@ lazy val shared = (project in file("./shared")).disablePlugins(RevolverPlugin)
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
-
     )
-  )
+  ).disablePlugins(RevolverPlugin)
 
 EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.ManagedClasses
 EclipseKeys.withSource := true
