@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 
 import akka.actor.ActorSystem
 import akka.io.IO
+import akka.pattern.AskableActorRef
 import akka.util.Timeout
 import boopickle.Default._
 import com.typesafe.scalalogging.LazyLogging
@@ -18,7 +19,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
 
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(15 seconds)
-  implicit val bodyPickler = compositePickler[Response]
+  private implicit val bodyPickler = compositePickler[Response]
     .addConcreteType[Failed]
     .addConcreteType[Success]
     .addConcreteType[Ready[Window]]
@@ -27,12 +28,15 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
     .addConcreteType[Ready[Seq[Element]]]
     .addConcreteType[Ready[Driver]]
 
-
   // implicit execution context
   private[webdriver] def ask(message: Request)(implicit host: String): Option[Response] = try {
-    val data = Pickle.intoBytes(message)
-    import akka.pattern.ask
-    val httpResponse = (IO(Http) ? HttpRequest(method = HttpMethods.POST, uri = Uri(s"$host/tell"), entity = HttpEntity(data.array()))).mapTo[HttpResponse]
+    val data = {
+      val arr=Array.emptyByteArray
+      Pickle.intoBytes(message).get(arr)
+      arr
+    }
+    val httpListener = new AskableActorRef(IO(Http))
+    val httpResponse = (httpListener ? HttpRequest(method = HttpMethods.POST, uri = Uri(s"$host/tell"), entity = HttpEntity(data))).mapTo[HttpResponse]
     val result = Await.result(httpResponse, 15 seconds)
     val response = Unpickle[Response].fromBytes(ByteBuffer.wrap(result.entity.data.toByteArray))
     response match {

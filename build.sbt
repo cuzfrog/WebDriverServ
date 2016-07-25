@@ -39,7 +39,7 @@ lazy val client = (project in file("./client")).dependsOn(shared)
   )
   .disablePlugins(RevolverPlugin)
 
-lazy val shared = (project in file("./shared")).disablePlugins(RevolverPlugin)
+lazy val shared = (project in file("./shared"))
   .settings(
     organization := "com.github.cuzfrog",
     name := "WebDriverShared",
