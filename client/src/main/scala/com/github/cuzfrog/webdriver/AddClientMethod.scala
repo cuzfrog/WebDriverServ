@@ -13,7 +13,7 @@ trait AddClientMethod extends LazyLogging {
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
   def newDriver(host: String, name: String, typ: DriverTypes.DriverType): Option[ClientDriver] =
-    ask(NewDriver(name, typ))(host) collect { case r: Ready[Driver] => ClientDriver(r.data, host) }
+    ask(NewDriver(name, typ))(host) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
   /**
     * Retrieve the stub of the driver instance from the server.
     *
@@ -22,14 +22,14 @@ trait AddClientMethod extends LazyLogging {
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
   def retrieveDriver(host: String, name: String): Option[ClientDriver] =
-    ask(RetrieveDriver(name))(host).map{case r:Ready[Driver] => ClientDriver(r.data, host)}
+    ask(RetrieveDriver(name))(host) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
 
   /**
     * Send shutdown command to the server.
     *
     * @param host uri of the server.
     */
-  def shutdownServer(host: String): Unit = ask[Success](Shutdown)(host).foreach(f => logger.trace(f.msg))
+  def shutdownServer(host: String): Unit = ask(Shutdown)(host) collect { case f: Success => logger.trace(f.msg) }
 }
 
 case class ClientDriver(driver: Driver, private implicit val host: String) extends LazyLogging {
@@ -41,7 +41,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
     * @return sequence of windows.
     */
   def getWindows: Seq[ClientWindow] = {
-    ask[Ready[Seq[Window]]](GetWindows(driver)).map(_.data.map(ClientWindow(_, host))) match {
+    ask(GetWindows(driver)) collect { case r: Ready[Seq[Window]]@unchecked => r.data.map(ClientWindow(_, host)) } match {
       case Some(s) => s
       case None => Nil
     }
@@ -49,17 +49,17 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
   /**
     * @return current focused window.
     */
-  def getWindow: Option[ClientWindow] = ask[Ready[Window]](GetWindow(driver)).map(r => ClientWindow(r.data, host))
+  def getWindow: Option[ClientWindow] = ask(GetWindow(driver)) collect { case r: Ready[Window]@unchecked => ClientWindow(r.data, host) }
   /**
     * Kill driver on the server, and clean all associated elements in repository. Aka invoke WebDriver.quit().
     */
-  def kill(): Unit = ask[Success](Kill(driver)).foreach(f => logger.trace(f.msg))
+  def kill(): Unit = ask(Kill(driver)) collect { case f: Success => logger.trace(f.msg) }
   /**
     * Clean all associated elements in server repository.
     *
     * @return number of elements cleaned.
     */
-  def clean(): Unit = ask[Success](Clean(driver)).foreach(f => logger.trace(f.msg))
+  def clean(): Unit = ask(Clean(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
 trait FindElementMethod {
   protected val _id: Long
@@ -73,7 +73,7 @@ trait FindElementMethod {
     * @return An Option of an element.
     */
   def findElement(attr: String, value: String): Option[ClientElement] =
-    ask[Ready[Element]](FindElement(_id, attr, value)).map(r => ClientElement(r.data, host))
+    ask(FindElement(_id, attr, value)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data, host) }
   /**
     * Invoke associated method on the server and return a sequence of stubs.
     *
@@ -82,7 +82,7 @@ trait FindElementMethod {
     * @return An Seq of elements, when empty it be Nil.
     */
   def findElements(attr: String, value: String): Seq[ClientElement] = {
-    ask[Ready[Seq[Element]]](FindElements(_id, attr, value)).map(_.data.map(ClientElement(_, host))) match {
+    ask(FindElements(_id, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement(_, host)) } match {
       case Some(s) => s
       case None => Nil
     }
@@ -103,23 +103,23 @@ case class ClientElement(element: Element, implicit val host: String) extends Fi
   /**
     * Send keys to the element. May fail.
     */
-  def sendKeys(keys: String): Unit = ask[Success](SendKeys(element, keys)).foreach(f => logger.trace(f.msg))
+  def sendKeys(keys: String): Unit = ask(SendKeys(element, keys)) collect { case f: Success => logger.trace(f.msg) }
   /**
     * If this causes a web reload or refresh, reference to elements before this invocation will be invalid.
     */
-  def submit(): Unit = ask[Success](Submit(element)).foreach(f => logger.trace(f.msg))
+  def submit(): Unit = ask(Submit(element)) collect { case f: Success => logger.trace(f.msg) }
   /**
     * If this causes a web reload or refresh, reference to elements before this invocation will be invalid.
     */
-  def click(): Unit = ask[Success](Click(element)).foreach(f => logger.trace(f.msg))
+  def click(): Unit = ask(Click(element)) collect { case f: Success => logger.trace(f.msg) }
   /**
     * Get value of the attribute.
     */
-  def getAttr(attr: String): Option[String] = ask[Success](GetAttr(element, attr)).map(_.msg)
+  def getAttr(attr: String): Option[String] = ask(GetAttr(element, attr)) collect { case f: Success => f.msg }
   /**
     * Get text of this element.
     */
-  def getText: Option[String] = ask[Success](GetText(element)).map(_.msg)
+  def getText: Option[String] = ask(GetText(element)) collect { case f: Success => f.msg }
 
 }
 

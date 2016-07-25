@@ -32,8 +32,10 @@ lazy val client = (project in file("./client")).dependsOn(shared)
       "com.typesafe.akka" %% "akka-actor" % "2.4.7",
       "me.chrons" %% "boopickle" % "1.2.4",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-      "ch.qos.logback" % "logback-classic" % "1.1.3"
-    )
+      "ch.qos.logback" % "logback-classic" % "1.1.3",
+      "com.lihaoyi" %% "utest" % "0.4.3" % "test"
+    ),
+    testFrameworks += new TestFramework("utest.runner.Framework")
   )
   .disablePlugins(RevolverPlugin)
 
