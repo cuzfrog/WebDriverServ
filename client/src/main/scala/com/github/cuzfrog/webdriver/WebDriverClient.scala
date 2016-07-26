@@ -1,7 +1,6 @@
 package com.github.cuzfrog.webdriver
 
 import akka.actor.ActorSystem
-import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
 
@@ -17,10 +16,9 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
   def shutdownClient() = system.terminate()
 
   // implicit execution context
-  private[webdriver] def ask(request: Request)(implicit host: String): Option[Response] = try {
-
+  private[webdriver] def control(request: Request)(implicit host: String): Option[Response] = try {
+    import akka.pattern.ask
     val remoteListener = system.actorSelection(s"akka.tcp://WebDriverServ@$host/user/handler")
-
     val tcpResponse = (remoteListener ? request).mapTo[Response]
     val response = Await.result(tcpResponse, 15 seconds)
 

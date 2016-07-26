@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "ch.qos.logback" % "logback-classic" % "1.1.3"
 )
+reColors := Seq("magenta")
 mainClass in reStart := Some("com.github.cuzfrog.webdriver.Server")
 
 lazy val client = (project in file("./client")).dependsOn(shared)
