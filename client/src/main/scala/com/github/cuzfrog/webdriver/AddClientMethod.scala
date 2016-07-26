@@ -3,7 +3,7 @@ package com.github.cuzfrog.webdriver
 import com.github.cuzfrog.webdriver.WebDriverClient.control
 import com.typesafe.scalalogging.LazyLogging
 
-trait AddClientMethod extends LazyLogging {
+private[webdriver] trait AddClientMethod extends LazyLogging {
   /**
     * Create a driver instance on the server and return a stub for manipulation.
     *
@@ -35,8 +35,11 @@ trait AddClientMethod extends LazyLogging {
 case class ClientDriver(driver: Driver, private implicit val host: String) extends LazyLogging {
   val name = driver.name
 
-  def get(url:String):Option[ClientWindow] = ???
-
+  /**
+    * @param url to navigate.
+    * @return Window focused.
+    */
+  def navigateTo(url: String): Option[ClientWindow] = control(Navigate(driver, url)) collect { case r: Ready[Window]@unchecked => ClientWindow(r.data, host) }
   /**
     * Return all windows opened by the driver. Driver will automatically switch to the window on which
     * some method is invoked.
@@ -64,7 +67,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
     */
   def clean(): Unit = control(Clean(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
-trait FindElementMethod {
+private[webdriver] trait FindElementMethod {
   protected val _id: Long
   protected implicit val host: String
   /**

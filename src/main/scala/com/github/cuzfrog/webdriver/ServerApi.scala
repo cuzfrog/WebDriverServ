@@ -1,7 +1,6 @@
 package com.github.cuzfrog.webdriver
 
 import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
 import org.openqa.selenium.{WebDriver, WebElement}
 
@@ -43,13 +42,12 @@ private[webdriver] object ServerApi extends Api {
     case "partiallink" | "partiallinktext" => By.partialLinkText(value)
   }
 
-
   def newDriver(name: String, typ: DriverTypes.DriverType): Driver = {
     val webDriver = typ match {
       case DriverTypes.IE => new InternetExplorerDriver()
       case DriverTypes.Chrome => new ChromeDriver()
-      case DriverTypes.FireFox => new FirefoxDriver()
-      case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic") //new HtmlUnitDriver()
+      case DriverTypes.FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
+      case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
     val driver = Driver(newId, name)
     repository.put(driver._id, DriverContainer(driver, webDriver))
@@ -58,7 +56,6 @@ private[webdriver] object ServerApi extends Api {
   }
 
   def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
-
 
   def findElement(id: Long, attr: String, value: String): Element =
     findElements(id, attr, value).head
@@ -110,6 +107,11 @@ private[webdriver] object ServerApi extends Api {
   def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
   def getText(element: Element): String = element.getText
 
+  def navigateTo(driver: Driver, url: String): Window = {
+    driver.get(url)
+    getWindow(driver)
+  }
+
   def getWindow(driver: Driver): Window = {
     val dc = getDriverContainer(driver)
     val webDriver = dc.seleniumDriver
@@ -132,7 +134,7 @@ private[webdriver] object ServerApi extends Api {
     window
   }
 
-  def shutdown()={
+  def shutdown() = {
     Server.shutdown()
   }
 }

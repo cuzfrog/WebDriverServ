@@ -26,6 +26,12 @@ private[webdriver] case class Clean(driver: Driver) extends Request {
     Success(s"$eleCnt elements cleaned.")
   }
 }
+private[webdriver] case class Navigate(driver: Driver, url: String) extends Request {
+  def execute(api: Api) = {
+    val window = api.navigateTo(driver, url)
+    Ready(window)
+  }
+}
 private[webdriver] case class GetWindow(driver: Driver) extends Request {
   def execute(api: Api) = Ready[Window](api.getWindow(driver))
 }

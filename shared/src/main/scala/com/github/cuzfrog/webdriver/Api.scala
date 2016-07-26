@@ -15,6 +15,7 @@ private[webdriver] trait Api {
   def clean(driver: Driver): Long
   def getAttr(element: Element, attr: String): String
   def getText(element: Element): String
+  def navigateTo(driver: Driver, url: String): Window
   def getWindow(driver: Driver): Window
   def getWindows(driver: Driver): Seq[Window]
   def shutdown(): Unit

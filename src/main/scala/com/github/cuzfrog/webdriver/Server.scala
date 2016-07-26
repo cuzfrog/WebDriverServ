@@ -1,6 +1,7 @@
 package com.github.cuzfrog.webdriver
 
 import akka.actor.{Actor, ActorSystem, Props, Terminated}
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Await
@@ -9,10 +10,14 @@ import scala.language.postfixOps
 
 private[webdriver] object Server extends App with LazyLogging {
   System.setProperty("config.file","./application.conf")
+  val config=ConfigFactory.load
+  System.setProperty("webdriver.chrome.driver", config.getString("webdriver.chrome.driver"))
+  System.setProperty("webdriver.ie.driver", config.getString("webdriver.ie.driver"))
+
   private val system = ActorSystem("WebDriverServ")
   private val handler = system.actorOf(Props[Service], name = "handler")
   import system.dispatcher
-  system.actorSelection("/user/handler") ! "It's alive."
+
   //  while (true) {
   //    val input = scala.io.StdIn.readLine()
   //    input match {
@@ -36,7 +41,7 @@ private[webdriver] class Service extends Actor with LazyLogging {
 
   def receive = {
     case r: Request =>
-      logger.debug(s"Receive request: $r")
+      //logger.debug(s"Receive request: $r")
       val response: Response = try {
         r.execute(ServerApi)
       } catch {
