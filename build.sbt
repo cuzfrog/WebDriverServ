@@ -12,9 +12,8 @@ resolvers ++= Seq(
 lazy val server = (project in file(".")).dependsOn(shared)
 libraryDependencies ++= Seq(
   "org.seleniumhq.selenium" % "selenium-java" % "2.53.1",
-  "io.spray" %% "spray-can" % "1.3.2",
-  "com.typesafe.akka" %% "akka-actor" % "2.4.7",
-  "me.chrons" %% "boopickle" % "1.2.4",
+  "com.typesafe.akka" %% "akka-actor" % "2.4.8",
+  "com.typesafe.akka" %% "akka-remote" % "2.4.8",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "ch.qos.logback" % "logback-classic" % "1.1.3"
 )
@@ -28,14 +27,11 @@ lazy val client = (project in file("./client")).dependsOn(shared)
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
-      "io.spray" %% "spray-can" % "1.3.2",
-      "com.typesafe.akka" %% "akka-actor" % "2.4.7",
-      "me.chrons" %% "boopickle" % "1.2.4",
+      "com.typesafe.akka" %% "akka-actor" % "2.4.8",
+      "com.typesafe.akka" %% "akka-remote" % "2.4.8",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-      "ch.qos.logback" % "logback-classic" % "1.1.3",
-      "com.lihaoyi" %% "utest" % "0.4.3" % "test"
-    ),
-    testFrameworks += new TestFramework("utest.runner.Framework")
+      "ch.qos.logback" % "logback-classic" % "1.1.3"
+    )
   )
   .disablePlugins(RevolverPlugin)
 

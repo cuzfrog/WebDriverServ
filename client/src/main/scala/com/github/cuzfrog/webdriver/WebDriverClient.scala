@@ -1,15 +1,9 @@
 package com.github.cuzfrog.webdriver
 
-import java.nio.ByteBuffer
-
 import akka.actor.ActorSystem
-import akka.io.IO
-import akka.pattern.AskableActorRef
+import akka.pattern.ask
 import akka.util.Timeout
-import boopickle.Default._
 import com.typesafe.scalalogging.LazyLogging
-import spray.can.Http
-import spray.http._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -19,26 +13,17 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
 
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(15 seconds)
-  private implicit val bodyPickler = compositePickler[Response]
-    .addConcreteType[Failed]
-    .addConcreteType[Success]
-    .addConcreteType[Ready[Window]]
-    .addConcreteType[Ready[Seq[Window]]]
-    .addConcreteType[Ready[Element]]
-    .addConcreteType[Ready[Seq[Element]]]
-    .addConcreteType[Ready[Driver]]
+
+  def shutdownClient() = system.terminate()
 
   // implicit execution context
-  private[webdriver] def ask(message: Request)(implicit host: String): Option[Response] = try {
-    val data = {
-      val arr=Array.emptyByteArray
-      Pickle.intoBytes(message).get(arr)
-      arr
-    }
-    val httpListener = new AskableActorRef(IO(Http))
-    val httpResponse = (httpListener ? HttpRequest(method = HttpMethods.POST, uri = Uri(s"$host/tell"), entity = HttpEntity(data))).mapTo[HttpResponse]
-    val result = Await.result(httpResponse, 15 seconds)
-    val response = Unpickle[Response].fromBytes(ByteBuffer.wrap(result.entity.data.toByteArray))
+  private[webdriver] def ask(request: Request)(implicit host: String): Option[Response] = try {
+
+    val remoteListener = system.actorSelection(s"akka.tcp://WebDriverServ@$host/user/handler")
+
+    val tcpResponse = (remoteListener ? request).mapTo[Response]
+    val response = Await.result(tcpResponse, 15 seconds)
+
     response match {
       case Failed(msg) => logger.debug(s"Server: failed-$msg"); None
       case _ => Some(response)

@@ -1,18 +1,15 @@
 package com.github.cuzfrog.webdriver
 
-import utest._
+object WebDriverClientTest extends App {
+  val host="localhost:60001"
 
-object WebDriverClientTest extends TestSuite {
+  val driver = WebDriverClient.newDriver(host, "test1", DriverTypes.FireFox)
+
+  WebDriverClient.shutdownServer(host)
 
 
-  val tests = this {
-    'test1 {
-      //val driver=WebDriverClient.newDriver("http://localhost:60001", "test1", DriverTypes.FireFox)
-      //WebDriverClient.shutdownServer("http://localhost:60001")
-
-    }
-
-  }
+  scala.io.StdIn.readLine("press any to shut down the client.....")
+  WebDriverClient.shutdownClient()
 
 
 }
