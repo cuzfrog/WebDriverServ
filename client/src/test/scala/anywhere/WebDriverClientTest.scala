@@ -2,20 +2,24 @@ package anywhere
 
 import com.github.cuzfrog.webdriver.{DriverTypes, WebDriverClient}
 
+import scala.language.implicitConversions
+
 object WebDriverClientTest extends App {
   val host = "192.168.56.101:60001"
-
-  val driver = WebDriverClient.retrieveDriver(host, "test1") match {
+  val driverName="test1"
+  val driver = WebDriverClient.retrieveDriver(host, driverName) match {
     case s@Some(_) => s
-    case None => WebDriverClient.newDriver(host, "test1", DriverTypes.Chrome)
+    case None => WebDriverClient.newDriver(host, driverName, DriverTypes.Chrome)
   }
 
+  implicit def getOption[T](option: Option[T]): T = option.get
   driver
-    .map(_.navigateTo("http://www.baidu.com"))
+    .navigateTo("http://www.bing.com")
+    .findElement("someAttr", "value")
 
 
-  //WebDriverClient.shutdownServer(host)
+
   scala.io.StdIn.readLine("press any to shut down the client.....")
   WebDriverClient.shutdownClient()
-
+  //WebDriverClient.shutdownServer(host) //when necessary
 }
