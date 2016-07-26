@@ -29,7 +29,7 @@ Right now, you need to build for yourself or:
 
 ####Client code:
 
-scala```
+```scala
 
 object WebDriverClientTest extends App {
   val host = "192.168.56.101:60001"
