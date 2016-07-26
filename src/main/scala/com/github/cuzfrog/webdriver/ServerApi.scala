@@ -10,7 +10,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Not thread safe, should be accessed within actor. Exceptions are handled in actor.
   */
-private[webdriver] object ServerApi extends Api {
+private[webdriver] class ServerApi extends Api {
 
   import scala.collection.concurrent.TrieMap
 

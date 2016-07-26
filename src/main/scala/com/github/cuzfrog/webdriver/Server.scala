@@ -38,12 +38,13 @@ private[webdriver] object Server extends App with LazyLogging {
 }
 
 private[webdriver] class Service extends Actor with LazyLogging {
+  val api=new ServerApi with ServerApiLogAfter
 
   def receive = {
     case r: Request =>
       //logger.debug(s"Receive request: $r")
       val response: Response = try {
-        r.execute(ServerApi)
+        r.execute(api)
       } catch {
         case e: Exception => Failed(e.getMessage)
       }
