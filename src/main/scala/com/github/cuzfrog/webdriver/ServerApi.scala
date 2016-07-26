@@ -135,6 +135,8 @@ private[webdriver] class ServerApi extends Api {
   }
 
   def shutdown() = {
+    repository.clear()
+    driverNameIndex.foreach{_._2.quit()}
     Server.shutdown()
   }
 }

@@ -10,7 +10,8 @@ object WebDriverClientTest extends App {
     case None => WebDriverClient.newDriver(host, "test1", DriverTypes.Chrome)
   }
 
-  driver.map(_.navigateTo("www.baidu.com"))
+  driver
+    .map(_.navigateTo("http://www.baidu.com"))
 
 
   //WebDriverClient.shutdownServer(host)
