@@ -13,11 +13,9 @@ object WebDriverClientTest extends App {
   }
 
   implicit def getOption[T](option: Option[T]): T = option.get
-  driver
-    .navigateTo("http://www.bing.com")
-    .findElement("someAttr", "value")
-
-
+  val window=driver.navigateTo("http://www.bing.com")
+  window.findElement("id", "sb_form_q").sendKeys("Juno mission")
+  window.findElement("id","sb_form").submit()
 
   scala.io.StdIn.readLine("press any to shut down the client.....")
   WebDriverClient.shutdownClient()

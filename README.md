@@ -6,6 +6,7 @@ A server running Selenium WebDriver which is intended to reuse WebDriver instanc
 When developing or debugging with WebDriver, we sometimes want to stay to the very page which can only be accessed by the driver who created it.
 This is where this project comes in to hold driver instance in a standalone jvm.
 
+Current under development.
 
 ####This project is written in Scala and includes two parts:
 
