@@ -38,12 +38,16 @@ private[webdriver] case class GetWindow(driver: Driver) extends Request {
 private[webdriver] case class GetWindows(driver: Driver) extends Request {
   def execute(api: Api) = Ready[Seq[Window]](api.getWindows(driver))
 }
-private[webdriver] case class FindElement(parent_id: Long, attr: String, value: String) extends Request {
-  def execute(api: Api) = Ready[Element](api.findElement(parent_id, attr, value))
+private[webdriver] case class FindElement(webBody: WebBody, attr: String, value: String) extends Request {
+  def execute(api: Api) = Ready[Element](api.findElement(webBody, attr, value))
 }
-private[webdriver] case class FindElements(parent_id: Long, attr: String, value: String) extends Request {
-  def execute(api: Api) = Ready[Seq[Element]](api.findElements(parent_id, attr, value))
+private[webdriver] case class FindElements(webBody: WebBody, attr: String, value: String) extends Request {
+  def execute(api: Api) = Ready[Seq[Element]](api.findElements(webBody, attr, value))
 }
+private[webdriver] case class ExecuteJS(webBody: WebBody, script: String, args: AnyRef*) extends Request {
+  def execute(api: Api) = Ready[Any](api.executeJS(webBody, script, args))
+}
+
 private[webdriver] case class SendKeys(element: Element, keys: String) extends Request {
   def execute(api: Api) = {
     api.sendKeys(element, keys)

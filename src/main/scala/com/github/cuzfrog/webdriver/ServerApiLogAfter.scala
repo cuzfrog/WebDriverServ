@@ -25,16 +25,26 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[$name]retrieve, result:$result")
     result
   }
-  abstract override def findElement(id: Long, attr: String, value: String): Element = {
-    val ele = super.findElement(id, attr, value)
-    logger.debug(s"[${ele.driver.name}]find element:${ele._id} by[attr=$attr,value=$value]")
+  abstract override def findElement(webBody: WebBody, attr: String, value: String): Element = {
+    val ele = super.findElement(webBody, attr, value)
+    logger.debug(s"[${
+      {
+        webBody.driver.name
+      }
+    }]find element:${ele._id} by[attr=$attr,value=$value]")
     ele
   }
-  abstract override def findElements(id: Long, attr: String, value: String): Seq[Element] = {
-    val elements = super.findElements(id, attr, value)
-    logger.debug(s"[$id]find elements:${elements.map(_._id)} by[attr=$attr,value=$value]")
+  abstract override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
+    val elements = super.findElements(webBody, attr, value)
+    logger.debug(s"[${webBody.driver.name}]find elements:${elements.map(_._id)} by[attr=$attr,value=$value]")
     elements
   }
+  abstract override def executeJS(webBody: WebBody, script: String, args: AnyRef*): Any = {
+    val result = super.executeJS(webBody, script, args)
+    logger.debug(s"[${webBody.driver.name}] execute javascript:${lineSeparator} $script")
+    result
+  }
+
   abstract override def sendKeys(element: Element, keys: String): Unit = {
     super.sendKeys(element, keys)
     logger.debug(s"[${element.driver.name}]send keys[$keys] to element:${element._id}")

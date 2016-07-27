@@ -2,7 +2,7 @@ package com.github.cuzfrog.webdriver
 
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
-import org.openqa.selenium.{WebDriver, WebElement}
+import org.openqa.selenium.{JavascriptExecutor, WebDriver, WebElement}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
@@ -27,6 +27,7 @@ private[webdriver] class ServerApi extends Api {
     repository(element._id).asInstanceOf[ElementContainer].seleniumElement
   private implicit def windowConversion(window: Window): String =
     repository(window._id).asInstanceOf[WindowContainer].window.handle
+  private implicit def driverToJSexecutioner(driver: Driver): JavascriptExecutor = driverConversion(driver).asInstanceOf[JavascriptExecutor]
   private def getDriverContainer(driver: Driver): DriverContainer = repository(driver._id).asInstanceOf[DriverContainer]
 
   import org.openqa.selenium.By
@@ -42,7 +43,7 @@ private[webdriver] class ServerApi extends Api {
     case "partiallink" | "partiallinktext" => By.partialLinkText(value)
   }
 
-  def newDriver(name: String, typ: DriverTypes.DriverType): Driver = {
+  override def newDriver(name: String, typ: DriverTypes.DriverType): Driver = {
     val webDriver = typ match {
       case DriverTypes.IE => new InternetExplorerDriver()
       case DriverTypes.Chrome => new ChromeDriver()
@@ -55,13 +56,13 @@ private[webdriver] class ServerApi extends Api {
     driver
   }
 
-  def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
+  override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
-  def findElement(id: Long, attr: String, value: String): Element =
-    findElements(id, attr, value).head
-  def findElements(id: Long, attr: String, value: String): Seq[Element] = {
+  override def findElement(webBody: WebBody, attr: String, value: String): Element =
+    findElements(webBody, attr, value).head
+  override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
     val by = toBy(attr, value)
-    val container = repository(id)
+    val container = repository(webBody._id)
     val sEles = container match {
       case DriverContainer(_, webDriver) => webDriver.findElements(by)
       case ElementContainer(el, seleniumElement) => el match {
@@ -84,10 +85,14 @@ private[webdriver] class ServerApi extends Api {
     elements.toList
   }
 
-  def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
-  def submit(element: Element) = element.submit()
-  def click(element: Element) = element.click()
-  def kill(driver: Driver): Long = {
+  override def executeJS(webBody: WebBody, script: String, args: AnyRef*): Any = {
+    webBody.driver.executeScript(script, args)
+  }
+
+  override def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
+  override def submit(element: Element) = element.submit()
+  override def click(element: Element) = element.click()
+  override def kill(driver: Driver): Long = {
     val dc = repository(driver._id).asInstanceOf[DriverContainer]
     dc.seleniumDriver.quit()
     driverNameIndex.remove(driver.name)
@@ -100,25 +105,25 @@ private[webdriver] class ServerApi extends Api {
     elements.clear()
     cnt
   }
-  def clean(driver: Driver) = {
+  override def clean(driver: Driver) = {
     val dc = repository(driver._id).asInstanceOf[DriverContainer]
     clean(dc.elements)
   }
-  def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
-  def getText(element: Element): String = element.getText
+  override def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
+  override def getText(element: Element): String = element.getText
 
-  def navigateTo(driver: Driver, url: String): Window = {
+  override def navigateTo(driver: Driver, url: String): Window = {
     driver.get(url)
     getWindow(driver)
   }
 
-  def getWindow(driver: Driver): Window = {
+  override def getWindow(driver: Driver): Window = {
     val dc = getDriverContainer(driver)
     val webDriver = dc.seleniumDriver
     val windowHandle = webDriver.getWindowHandle
     createRegisterWindow(dc, driver, webDriver, windowHandle)
   }
-  def getWindows(driver: Driver): Seq[Window] = {
+  override def getWindows(driver: Driver): Seq[Window] = {
     val dc = getDriverContainer(driver)
     val webDriver = dc.seleniumDriver
     val windowHandles = webDriver.getWindowHandles
@@ -136,7 +141,10 @@ private[webdriver] class ServerApi extends Api {
 
   def shutdown() = {
     repository.clear()
-    driverNameIndex.foreach{_._2.quit()}
+    driverNameIndex.foreach {
+      _._2.quit()
+    }
     Server.shutdown()
   }
+
 }

@@ -1,6 +1,6 @@
+
 organization := "com.github.cuzfrog"
 name := "WebDriverServ"
-version := Settings.version
 scalaVersion := Settings.scalaVersion
 
 resolvers ++= Seq(
@@ -8,6 +8,7 @@ resolvers ++= Seq(
   "bintray-cuzfrog-maven" at "http://dl.bintray.com/cuzfrog/maven",
   "spray repo" at "http://repo.spray.io"
 )
+
 
 lazy val server = (project in file(".")).dependsOn(shared)
 libraryDependencies ++= Seq(
@@ -24,7 +25,6 @@ lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
     organization := "com.github.cuzfrog",
     name := "WebDriverCli",
-    version := Settings.version,
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
@@ -40,15 +40,19 @@ lazy val shared = (project in file("./shared"))
   .settings(
     organization := "com.github.cuzfrog",
     name := "WebDriverShared",
-    version := Settings.version,
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
     )
   ).disablePlugins(RevolverPlugin)
 
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.ManagedClasses
-EclipseKeys.withSource := true
-EclipseKeys.withJavadoc := true
-
 addCommandAlias("change",";re-stop;re-start")
+
+//release:
+import ReleaseTransformations._
+releaseProcess := Seq[ReleaseStep](
+  inquireVersions,
+  setReleaseVersion,
+  setNextVersion
+)
+addCommandAlias("bumpVer","release with-defaults")

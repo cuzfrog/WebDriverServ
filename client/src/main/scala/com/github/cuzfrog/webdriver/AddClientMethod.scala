@@ -68,7 +68,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
   def clean(): Unit = control(Clean(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
 private[webdriver] trait FindElementMethod {
-  protected val _id: Long
+  protected val webBody: WebBody
   protected implicit val host: String
   /**
     * Invoke FindElement on the server and return a stub of an element.
@@ -79,7 +79,7 @@ private[webdriver] trait FindElementMethod {
     * @return An Option of an element.
     */
   def findElement(attr: String, value: String): Option[ClientElement] =
-    control(FindElement(_id, attr, value)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data, host) }
+    control(FindElement(webBody, attr, value)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data, host) }
   /**
     * Invoke associated method on the server and return a sequence of stubs.
     *
@@ -88,11 +88,16 @@ private[webdriver] trait FindElementMethod {
     * @return An Seq of elements, when empty it be Nil.
     */
   def findElements(attr: String, value: String): Seq[ClientElement] = {
-    control(FindElements(_id, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement(_, host)) } match {
+    control(FindElements(webBody, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement(_, host)) } match {
       case Some(s) => s
       case None => Nil
     }
   }
+
+  /**
+    * Change type of driver on server to JavascriptExecutor and execute the js. The driver has already switched to this frame or window.
+    */
+  def executeJS(script: String, args: AnyRef*): Any = control(ExecuteJS(webBody, script, args))
 }
 case class ClientWindow(window: Window, host: String) extends FindElementMethod {
   val title = window.title
@@ -100,11 +105,11 @@ case class ClientWindow(window: Window, host: String) extends FindElementMethod 
     * Equal with windowHandle of the driver on server.
     */
   val handle = window.handle
-  protected val _id = window._id
+  protected val webBody: WebBody = window
 }
 
 case class ClientElement(element: Element, implicit val host: String) extends FindElementMethod with LazyLogging {
-  protected val _id = element._id
+  protected val webBody: WebBody = element
 
   /**
     * Send keys to the element. May fail.
