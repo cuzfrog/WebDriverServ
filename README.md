@@ -1,11 +1,13 @@
 # WebDriver Sever
 
+Go [A list of headless browsers](http://www.asad.pw/HeadlessBrowsers/), see if you have a better choice.
+
 A server running Selenium WebDriver which is intended to reuse WebDriver instance.
 When developing or debugging with WebDriver, we sometimes want to stay to the very page which can only be accessed by the driver who created it.
 This is where this project comes in to hold driver instance in a standalone jvm.
 
 
-####This project includes two parts:
+####This project is written in Scala and includes two parts:
 
 1.A server that runs a Selenium WebDriver and accepts client instruction.
 
