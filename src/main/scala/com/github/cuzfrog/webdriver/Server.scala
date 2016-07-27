@@ -46,7 +46,9 @@ private[webdriver] class Service extends Actor with LazyLogging {
       val response: Response = try {
         r.execute(api)
       } catch {
-        case e: Exception => Failed(e.getMessage)
+        case e: Exception =>
+          e.printStackTrace()
+          Failed(e.getMessage)
       }
       sender ! response
     case s:String =>

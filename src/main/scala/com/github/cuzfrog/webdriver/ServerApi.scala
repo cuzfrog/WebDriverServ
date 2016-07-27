@@ -85,8 +85,8 @@ private[webdriver] class ServerApi extends Api {
     elements.toList
   }
 
-  override def executeJS(webBody: WebBody, script: String, args: AnyRef*): Any = {
-    webBody.driver.executeScript(script, args)
+  override def executeJS(webBody: WebBody, script: String): Any = {
+    webBody.driver.executeScript(script)
   }
 
   override def sendKeys(element: Element, keys: String) = element.sendKeys(keys)

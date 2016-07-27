@@ -39,9 +39,9 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${webBody.driver.name}]find elements:${elements.map(_._id)} by[attr=$attr,value=$value]")
     elements
   }
-  abstract override def executeJS(webBody: WebBody, script: String, args: AnyRef*): Any = {
-    val result = super.executeJS(webBody, script, args)
-    logger.debug(s"[${webBody.driver.name}] execute javascript:${lineSeparator} $script")
+  abstract override def executeJS(webBody: WebBody, script: String): Any = {
+    val result = super.executeJS(webBody, script)
+    logger.debug(s"[${webBody.driver.name}] execute javascript:$lineSeparator $script")
     result
   }
 

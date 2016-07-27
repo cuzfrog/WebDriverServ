@@ -45,7 +45,7 @@ private[webdriver] case class FindElements(webBody: WebBody, attr: String, value
   def execute(api: Api) = Ready[Seq[Element]](api.findElements(webBody, attr, value))
 }
 private[webdriver] case class ExecuteJS(webBody: WebBody, script: String, args: AnyRef*) extends Request {
-  def execute(api: Api) = Ready[Any](api.executeJS(webBody, script, args))
+  def execute(api: Api) = Ready[Any](api.executeJS(webBody, script))
 }
 
 private[webdriver] case class SendKeys(element: Element, keys: String) extends Request {

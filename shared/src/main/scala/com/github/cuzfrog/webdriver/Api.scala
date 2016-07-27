@@ -8,7 +8,7 @@ private[webdriver] trait Api {
   def retrieveDriver(name: String): Option[Driver]
   def findElement(webBody: WebBody, attr: String, value: String): Element
   def findElements(webBody: WebBody, attr: String, value: String): Seq[Element]
-  def executeJS(webBody: WebBody, script: String, args: AnyRef*): Any
+  def executeJS(webBody: WebBody, script: String): Any
   def sendKeys(element: Element, keys: String): Unit
   def submit(element: Element): Unit
   def click(element: Element): Unit
