@@ -50,9 +50,11 @@ addCommandAlias("change",";re-stop;re-start")
 
 //release:
 import ReleaseTransformations._
+import sbtrelease._
 releaseProcess := Seq[ReleaseStep](
   inquireVersions,
   setReleaseVersion,
   setNextVersion
 )
+releaseNextVersion := { ver => Version(ver).map(_.bumpMinor.string).getOrElse(versionFormatError) }
 addCommandAlias("bumpVer","release with-defaults")
