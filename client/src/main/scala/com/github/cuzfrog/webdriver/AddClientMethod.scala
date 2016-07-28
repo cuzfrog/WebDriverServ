@@ -15,7 +15,7 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
   def newDriver(host: String, name: String, typ: DriverType, waitSec: Int = 10): Option[ClientDriver] =
-    control(NewDriver(name, typ, waitSec))(host) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
+    control(NewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
   /**
     * Retrieve the stub of the driver instance from the server.
     *
@@ -24,14 +24,14 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
   def retrieveDriver(host: String, name: String): Option[ClientDriver] =
-    control(RetrieveDriver(name))(host) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
+    control(RetrieveDriver(name)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
 
   /**
     * Send shutdown command to the server.
     *
     * @param host uri of the server.
     */
-  def shutdownServer(host: String): Unit = control(Shutdown)(host) collect { case f: Success => logger.trace(f.msg) }
+  def shutdownServer(host: String): Unit = control(Shutdown) collect { case f: Success => logger.trace(f.msg) }
 }
 
 case class ClientDriver(driver: Driver, private implicit val host: String) extends LazyLogging {

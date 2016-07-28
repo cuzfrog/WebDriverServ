@@ -12,17 +12,18 @@ import scala.language.postfixOps
 
 object WebDriverClient extends AddClientMethod with LazyLogging {
   private val config=ConfigFactory.load
+  private val host=config.getString("webdriver.client.host")
   private val timeoutSec=config.getInt("webdriver.client.timeout")
   private val actionIntervalMs=config.getInt("webdriver.client.action-interval")
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
-
+  private val remoteListener = system.actorSelection(s"akka.tcp://WebDriverServ@$host/user/handler")
   def shutdownClient() = system.terminate()
 
   // implicit execution context
-  private[webdriver] def control(request: Request)(implicit host: String): Option[Response] = try {
+  private[webdriver] def control(request: Request): Option[Response] = try {
     import akka.pattern.ask
-    val remoteListener = system.actorSelection(s"akka.tcp://WebDriverServ@$host/user/handler")
+
     Thread.sleep(actionIntervalMs)
     val tcpResponse = (remoteListener ? request).mapTo[Response]
     val response = Await.result(tcpResponse, timeoutSec seconds)
