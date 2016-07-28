@@ -16,7 +16,7 @@ object WebDriverClientTest extends App {
   val window=driver.navigateTo("http://www.bing.com")
   window.findElement("id", "sb_form_q").sendKeys("Juno mission")
   window.findElement("id","sb_form").submit()
-  window.executeJS("alert('testJS')")
+  window.executeJS("console.log('testJS')")
 
   scala.io.StdIn.readLine("press any to shut down the client.....")
   WebDriverClient.shutdownClient()

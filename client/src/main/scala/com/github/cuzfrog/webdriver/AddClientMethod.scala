@@ -8,9 +8,9 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
   /**
     * Create a driver instance on the server and return a stub for manipulation.
     *
-    * @param host url of the host, example: http://localhost:9000
-    * @param name to give the driver a name, so that it can be easily remembered or retrieved next run time.
-    * @param typ  driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
+    * @param host    url of the host, example: http://localhost:9000
+    * @param name    to give the driver a name, so that it can be easily remembered or retrieved next run time.
+    * @param typ     driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
     * @param waitSec seconds to wait implicitly.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
@@ -97,7 +97,9 @@ private[webdriver] trait FindElementMethod {
   }
 
   /**
-    * Change type of driver on server to JavascriptExecutor and execute the js. The driver has already switched to this frame or window.
+    * Change type of driver on server to JavascriptExecutor and execute the js.
+    * The driver has already switched to this frame or window.
+    * This can also be used to inject script.
     */
   def executeJS(script: String, args: AnyRef*): Any = control(ExecuteJS(webBody, script, args))
 }
