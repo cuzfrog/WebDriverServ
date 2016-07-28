@@ -8,40 +8,36 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
   /**
     * Create a driver instance on the server and return a stub for manipulation.
     *
-    * @param host    url of the host, example: http://localhost:9000
     * @param name    to give the driver a name, so that it can be easily remembered or retrieved next run time.
     * @param typ     driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
     * @param waitSec seconds to wait implicitly.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def newDriver(host: String, name: String, typ: DriverType, waitSec: Int = 10): Option[ClientDriver] =
-    control(NewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
+  def newDriver(name: String, typ: DriverType, waitSec: Int = 10): Option[ClientDriver] =
+    control(NewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
   /**
     * Retrieve the stub of the driver instance from the server.
     *
-    * @param host url of the host, example: http://localhost:90001
     * @param name the name of the driver.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def retrieveDriver(host: String, name: String): Option[ClientDriver] =
-    control(RetrieveDriver(name)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
+  def retrieveDriver(name: String): Option[ClientDriver] =
+    control(RetrieveDriver(name)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
 
   /**
     * Send shutdown command to the server.
-    *
-    * @param host uri of the server.
     */
-  def shutdownServer(host: String): Unit = control(Shutdown) collect { case f: Success => logger.trace(f.msg) }
+  def shutdownServer(): Unit = control(Shutdown) collect { case f: Success => logger.trace(f.msg) }
 }
 
-case class ClientDriver(driver: Driver, private implicit val host: String) extends LazyLogging {
+case class ClientDriver(driver: Driver) extends LazyLogging {
   val name = driver.name
 
   /**
     * @param url to navigate.
     * @return Window focused.
     */
-  def navigateTo(url: String): Option[ClientWindow] = control(Navigate(driver, url)) collect { case r: Ready[Window]@unchecked => ClientWindow(r.data, host) }
+  def navigateTo(url: String): Option[ClientWindow] = control(Navigate(driver, url)) collect { case r: Ready[Window]@unchecked => ClientWindow(r.data) }
   /**
     * Return all windows opened by the driver. Driver will automatically switch to the window on which
     * some method is invoked.
@@ -49,7 +45,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
     * @return sequence of windows.
     */
   def getWindows: Seq[ClientWindow] = {
-    control(GetWindows(driver)) collect { case r: Ready[Seq[Window]]@unchecked => r.data.map(ClientWindow(_, host)) } match {
+    control(GetWindows(driver)) collect { case r: Ready[Seq[Window]]@unchecked => r.data.map(ClientWindow(_)) } match {
       case Some(s) => s
       case None => Nil
     }
@@ -57,7 +53,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
   /**
     * @return current focused window.
     */
-  def getWindow: Option[ClientWindow] = control(GetWindow(driver)) collect { case r: Ready[Window]@unchecked => ClientWindow(r.data, host) }
+  def getWindow: Option[ClientWindow] = control(GetWindow(driver)) collect { case r: Ready[Window]@unchecked => ClientWindow(r.data) }
   /**
     * Kill driver on the server, and clean all associated elements in repository. Aka invoke WebDriver.quit().
     */
@@ -71,7 +67,6 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
 }
 private[webdriver] trait WebBodyMethod {
   protected val webBody: WebBody
-  protected implicit val host: String
   /**
     * Invoke FindElement on the server and return a stub of an element.
     * If this element is a frame, methods are invoked after an automatic driver switch.
@@ -81,7 +76,7 @@ private[webdriver] trait WebBodyMethod {
     * @return An Option of an element.
     */
   def findElement(attr: String, value: String): Option[ClientElement] =
-    control(FindElement(webBody, attr, value)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data, host) }
+    control(FindElement(webBody, attr, value)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data) }
   /**
     * Invoke associated method on the server and return a sequence of stubs.
     *
@@ -90,7 +85,7 @@ private[webdriver] trait WebBodyMethod {
     * @return An Seq of elements, when empty it be Nil.
     */
   def findElements(attr: String, value: String): Seq[ClientElement] = {
-    control(FindElements(webBody, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement(_, host)) } match {
+    control(FindElements(webBody, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement(_)) } match {
       case Some(s) => s
       case None => Nil
     }
@@ -103,7 +98,7 @@ private[webdriver] trait WebBodyMethod {
     */
   def executeJS(script: String, args: AnyRef*): Any = control(ExecuteJS(webBody, script, args))
 }
-case class ClientWindow(window: Window, host: String) extends WebBodyMethod {
+case class ClientWindow(window: Window) extends WebBodyMethod {
   val title = window.title
   /**
     * Equal with windowHandle of the driver on server.
@@ -112,7 +107,7 @@ case class ClientWindow(window: Window, host: String) extends WebBodyMethod {
   protected val webBody: WebBody = window
 }
 
-case class ClientElement(element: Element, implicit val host: String) extends WebBodyMethod with LazyLogging {
+case class ClientElement(element: Element) extends WebBodyMethod with LazyLogging {
   protected val webBody: WebBody = element
 
   /**
