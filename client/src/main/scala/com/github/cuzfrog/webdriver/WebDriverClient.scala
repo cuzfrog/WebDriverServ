@@ -2,21 +2,18 @@ package com.github.cuzfrog.webdriver
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 
-/**
-  *
-  * @param timeoutSec timeout for communication with server.
-  *                   This should be set long, because server need time to take web action.
-  * @param actionIntervalMs the least time interval between every two request to the server.
-  */
-final class WebDriverClient(timeoutSec: Int = 15, actionIntervalMs: Int = 50)
-  extends AddClientMethod with LazyLogging {
 
+object WebDriverClient extends AddClientMethod with LazyLogging {
+  private val config=ConfigFactory.load
+  private val timeoutSec=config.getInt("webdriver.client.timeout")
+  private val actionIntervalMs=config.getInt("webdriver.client.action-interval")
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
 

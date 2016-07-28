@@ -17,6 +17,7 @@ private[webdriver] object Server extends App with LazyLogging {
 
   private val system = ActorSystem("WebDriverServ")
   private val handler = system.actorOf(Props[Service], name = "handler")
+  handler ! "initiation"
   import system.dispatcher
 
   //  while (true) {
