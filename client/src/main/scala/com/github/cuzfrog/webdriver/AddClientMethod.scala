@@ -13,7 +13,7 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
     * @param waitSec seconds to wait implicitly.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def newDriver(name: String, typ: DriverType, waitSec: Int = 10): Option[ClientDriver] =
+  def newDriver(name: String, typ: DriverType, waitSec: Int = 15): Option[ClientDriver] =
     control(NewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
   /**
     * Retrieve the stub of the driver instance from the server.

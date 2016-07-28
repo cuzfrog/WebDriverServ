@@ -49,7 +49,7 @@ private[webdriver] class Service extends Actor with LazyLogging {
         r.execute(api)
       } catch {
         case e: Exception =>
-          e.printStackTrace()
+          //e.printStackTrace()
           Failed(e.getMessage)
       }
       sender ! response

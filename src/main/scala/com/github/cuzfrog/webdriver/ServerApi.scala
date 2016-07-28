@@ -53,7 +53,7 @@ private[webdriver] class ServerApi extends Api {
       case DriverTypes.FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
       case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
-    webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS)
+    webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS) //implicit waiting
     val driver = Driver(newId, name)
     repository.put(driver._id, DriverContainer(driver, webDriver))
     driverNameIndex.put(name, driver)
@@ -62,8 +62,12 @@ private[webdriver] class ServerApi extends Api {
 
   override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
-  override def findElement(webBody: WebBody, attr: String, value: String): Element =
+  override def findElement(webBody: WebBody, attr: String, value: String): Element =try{
     findElements(webBody, attr, value).head
+  }catch{
+    case e:NoSuchElementException =>
+      throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:attr:$attr ,value:$value")
+  }
   override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
     val by = toBy(attr, value)
     val container = repository(webBody._id)
