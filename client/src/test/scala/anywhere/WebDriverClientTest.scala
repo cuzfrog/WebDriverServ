@@ -7,9 +7,10 @@ import scala.language.implicitConversions
 object WebDriverClientTest extends App {
   val host = "192.168.56.101:60001"
   val driverName="test1"
-  val driver = WebDriverClient.retrieveDriver(host, driverName) match {
+  val client=new WebDriverClient()
+  val driver =client.retrieveDriver(host, driverName) match {
     case s@Some(_) => s
-    case None => WebDriverClient.newDriver(host, driverName, DriverTypes.Chrome)
+    case None => client.newDriver(host, driverName, DriverTypes.Chrome)
   }
 
   implicit def getOption[T](option: Option[T]): T = option.get

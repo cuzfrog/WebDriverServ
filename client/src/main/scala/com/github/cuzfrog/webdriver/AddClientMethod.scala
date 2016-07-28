@@ -69,7 +69,7 @@ case class ClientDriver(driver: Driver, private implicit val host: String) exten
     */
   def clean(): Unit = control(Clean(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
-private[webdriver] trait FindElementMethod {
+private[webdriver] trait WebBodyMethod {
   protected val webBody: WebBody
   protected implicit val host: String
   /**
@@ -103,7 +103,7 @@ private[webdriver] trait FindElementMethod {
     */
   def executeJS(script: String, args: AnyRef*): Any = control(ExecuteJS(webBody, script, args))
 }
-case class ClientWindow(window: Window, host: String) extends FindElementMethod {
+case class ClientWindow(window: Window, host: String) extends WebBodyMethod {
   val title = window.title
   /**
     * Equal with windowHandle of the driver on server.
@@ -112,7 +112,7 @@ case class ClientWindow(window: Window, host: String) extends FindElementMethod 
   protected val webBody: WebBody = window
 }
 
-case class ClientElement(element: Element, implicit val host: String) extends FindElementMethod with LazyLogging {
+case class ClientElement(element: Element, implicit val host: String) extends WebBodyMethod with LazyLogging {
   protected val webBody: WebBody = element
 
   /**

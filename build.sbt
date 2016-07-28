@@ -1,6 +1,6 @@
 
 organization := "com.github.cuzfrog"
-name := "WebDriverServ"
+name := "webdriver-server"
 scalaVersion := Settings.scalaVersion
 
 resolvers ++= Seq(
@@ -24,7 +24,7 @@ mainClass in reStart := Some("com.github.cuzfrog.webdriver.Server")
 lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
     organization := "com.github.cuzfrog",
-    name := "WebDriverCli",
+    name := "webdriver-client",
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
@@ -39,7 +39,7 @@ lazy val client = (project in file("./client")).dependsOn(shared)
 lazy val shared = (project in file("./shared"))
   .settings(
     organization := "com.github.cuzfrog",
-    name := "WebDriverShared",
+    name := "webdriver-shared",
     scalaVersion := Settings.scalaVersion,
     scalacOptions ++= Settings.scalacOptions,
     libraryDependencies ++= Seq(
@@ -56,5 +56,6 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   setNextVersion
 )
-releaseNextVersion := { ver => Version(ver).map(_.bumpMinor.string).getOrElse(versionFormatError) }
+releaseNextVersion := { ver => Version(ver).map(_.bumpNext.string).getOrElse(versionFormatError) }
 addCommandAlias("bumpVer","release with-defaults")
+addCommandAlias("publish-local-client",";client/publish-local;shared/publish-local")
