@@ -1,5 +1,8 @@
 package com.github.cuzfrog.webdriver
 
+import java.util.concurrent.TimeUnit
+
+import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
 import org.openqa.selenium.{JavascriptExecutor, WebDriver, WebElement}
@@ -43,13 +46,14 @@ private[webdriver] class ServerApi extends Api {
     case "partiallink" | "partiallinktext" => By.partialLinkText(value)
   }
 
-  override def newDriver(name: String, typ: DriverTypes.DriverType): Driver = {
+  override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
     val webDriver = typ match {
       case DriverTypes.IE => new InternetExplorerDriver()
       case DriverTypes.Chrome => new ChromeDriver()
       case DriverTypes.FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
       case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
+    webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS)
     val driver = Driver(newId, name)
     repository.put(driver._id, DriverContainer(driver, webDriver))
     driverNameIndex.put(name, driver)

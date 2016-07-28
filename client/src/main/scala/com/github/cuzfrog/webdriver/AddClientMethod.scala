@@ -1,5 +1,6 @@
 package com.github.cuzfrog.webdriver
 
+import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 import com.github.cuzfrog.webdriver.WebDriverClient.control
 import com.typesafe.scalalogging.LazyLogging
 
@@ -10,10 +11,11 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
     * @param host url of the host, example: http://localhost:9000
     * @param name to give the driver a name, so that it can be easily remembered or retrieved next run time.
     * @param typ  driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
+    * @param waitSec seconds to wait implicitly.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def newDriver(host: String, name: String, typ: DriverTypes.DriverType): Option[ClientDriver] =
-    control(NewDriver(name, typ))(host) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
+  def newDriver(host: String, name: String, typ: DriverType, waitSec: Int = 10): Option[ClientDriver] =
+    control(NewDriver(name, typ, waitSec))(host) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data, host) }
   /**
     * Retrieve the stub of the driver instance from the server.
     *

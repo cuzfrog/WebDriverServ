@@ -5,8 +5,8 @@ private[webdriver] sealed trait Message
 private[webdriver] sealed trait Request extends Message {
   def execute(api: Api): Response
 }
-private[webdriver] case class NewDriver(name: String, typ: DriverTypes.DriverType) extends Request {
-  def execute(api: Api) = Ready[Driver](api.newDriver(name, typ))
+private[webdriver] case class NewDriver(name: String, typ: DriverTypes.DriverType, waitSec: Int) extends Request {
+  def execute(api: Api) = Ready[Driver](api.newDriver(name, typ, waitSec))
 }
 private[webdriver] case class RetrieveDriver(name: String) extends Request {
   def execute(api: Api) = api.retrieveDriver(name) match {

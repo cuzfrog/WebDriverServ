@@ -15,7 +15,7 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${driver.name}]getWindows:$lineSeparator${windows.mkString(lineSeparator)}")
     windows
   }
-  abstract override def newDriver(name: String, typ: DriverType): Driver = {
+  abstract override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
     val driver = super.newDriver(name, typ)
     logger.debug(s"[${driver.name}]create new driver[$typ]")
     driver

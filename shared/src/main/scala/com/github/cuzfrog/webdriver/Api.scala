@@ -1,10 +1,11 @@
 package com.github.cuzfrog.webdriver
+import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 
 /**
   * Shared Api.
   */
 private[webdriver] trait Api {
-  def newDriver(name: String, typ: DriverTypes.DriverType): Driver
+  def newDriver(name: String, typ: DriverType, waitSec: Int = 10): Driver
   def retrieveDriver(name: String): Option[Driver]
   def findElement(webBody: WebBody, attr: String, value: String): Element
   def findElements(webBody: WebBody, attr: String, value: String): Seq[Element]
