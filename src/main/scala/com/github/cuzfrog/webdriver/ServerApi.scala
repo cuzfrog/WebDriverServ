@@ -5,10 +5,12 @@ import java.util.concurrent.TimeUnit
 import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
+import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import org.openqa.selenium.{JavascriptExecutor, WebDriver, WebElement}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.TimeoutException
 
 /**
   * Not thread safe, should be accessed within actor. Exceptions are handled in actor.
@@ -62,10 +64,10 @@ private[webdriver] class ServerApi extends Api {
 
   override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
-  override def findElement(webBody: WebBody, attr: String, value: String): Element =try{
+  override def findElement(webBody: WebBody, attr: String, value: String): Element = try {
     findElements(webBody, attr, value).head
-  }catch{
-    case e:NoSuchElementException =>
+  } catch {
+    case e: NoSuchElementException =>
       throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:attr:$attr ,value:$value")
   }
   override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
@@ -79,8 +81,6 @@ private[webdriver] class ServerApi extends Api {
       }
       case WindowContainer(window, sd) => sd.switchTo().window(window.handle).findElements(by)
     }
-
-
     val elements = sEles.map { sEle =>
       val ele = sEle.getTagName.toLowerCase match {
         case "frame" | "iframe" => Frame(newId, container.driver)
@@ -92,7 +92,13 @@ private[webdriver] class ServerApi extends Api {
     }
     elements.toList
   }
-
+  override def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean = try {
+    val by = toBy(attr, value)
+    new WebDriverWait(webBody.driver, 0).until(ExpectedConditions.presenceOfElementLocated(by))
+    true
+  } catch {
+    case e: TimeoutException => false
+  }
   override def executeJS(webBody: WebBody, script: String): Any = {
     webBody.driver.executeScript(script)
   }

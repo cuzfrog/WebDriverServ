@@ -1,4 +1,5 @@
 package com.github.cuzfrog.webdriver
+
 import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 
 /**
@@ -9,6 +10,7 @@ private[webdriver] trait Api {
   def retrieveDriver(name: String): Option[Driver]
   def findElement(webBody: WebBody, attr: String, value: String): Element
   def findElements(webBody: WebBody, attr: String, value: String): Seq[Element]
+  def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean
   def executeJS(webBody: WebBody, script: String): Any
   def sendKeys(element: Element, keys: String): Unit
   def submit(element: Element): Unit

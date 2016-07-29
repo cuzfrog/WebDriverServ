@@ -90,7 +90,18 @@ private[webdriver] trait WebBodyMethod {
       case None => Nil
     }
   }
-
+  /**
+    * Check if an element exists. This method is different from findElement for it does not wait for the the element.
+    * @param attr  which includes:id, name, tag, xpath, class/className, css/cssSelector, link and partialLink. Case insensitive.
+    * @param value of the attr.
+    * @return true if the element is present at this moment. Otherwise false, including error.
+    */
+  def checkElementExistence(attr: String, value: String): Boolean = {
+    control(CheckElementExistence(webBody, attr, value)) match {
+      case Some(r: Ready[Boolean]@unchecked) => r.data
+      case _ => false
+    }
+  }
   /**
     * Change type of driver on server to JavascriptExecutor and execute the js.
     * The driver has already switched to this frame or window.
