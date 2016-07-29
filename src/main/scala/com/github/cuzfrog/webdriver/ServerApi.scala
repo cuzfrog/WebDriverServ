@@ -129,6 +129,7 @@ private[webdriver] class ServerApi extends Api {
   }
   override def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
   override def getText(element: Element): String = element.getText
+  override def closeWindow(window: Window): Unit = window.driver.close()
 
   override def navigateTo(driver: Driver, url: String): Window = {
     driver.get(url)

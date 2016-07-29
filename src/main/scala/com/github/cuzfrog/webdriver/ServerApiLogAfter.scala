@@ -82,6 +82,10 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${element.driver.name}]get text")
     value
   }
+  abstract override def closeWindow(window: Window): Unit={
+    super.closeWindow(window)
+    logger.debug(s"[${window.driver.name}]close window:${window.title}")
+  }
   abstract override def navigateTo(driver: Driver, url: String): Window = {
     val window = super.navigateTo(driver, url)
     logger.debug(s"[${driver.name}]navigate to $url and return window:${window.title}")

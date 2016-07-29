@@ -1,6 +1,10 @@
 package com.github.cuzfrog.webdriver
 
-private[webdriver] sealed trait Message
+import scala.language.implicitConversions
+
+private[webdriver] sealed trait Message {
+  protected implicit def classNameToString(message: Message): String = message.getClass.getSimpleName
+}
 
 private[webdriver] sealed trait Request extends Message {
   def execute(api: Api): Response
@@ -60,19 +64,19 @@ private[webdriver] case class SendKeys(element: Element, keys: String) extends R
 private[webdriver] case class ClearText(element: Element) extends Request {
   def execute(api: Api) = {
     api.clearText(element)
-    Success("Submit")
+    Success(this)
   }
 }
 private[webdriver] case class Submit(element: Element) extends Request {
   def execute(api: Api) = {
     api.submit(element)
-    Success("Submit")
+    Success(this)
   }
 }
 private[webdriver] case class Click(element: Element) extends Request {
   def execute(api: Api) = {
     api.click(element)
-    Success("Clicked")
+    Success(this)
   }
 }
 private[webdriver] case class GetAttr(element: Element, attr: String) extends Request {
@@ -81,6 +85,13 @@ private[webdriver] case class GetAttr(element: Element, attr: String) extends Re
 private[webdriver] case class GetText(element: Element) extends Request {
   def execute(api: Api) = Success(api.getText(element))
 }
+private[webdriver] case class CloseWindow(window: Window) extends Request {
+  def execute(api: Api) = {
+    api.closeWindow(window)
+    Success(this)
+  }
+}
+
 private[webdriver] case object Shutdown extends Request {
   def execute(api: Api) = {
     api.shutdown()

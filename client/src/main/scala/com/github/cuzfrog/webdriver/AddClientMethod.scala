@@ -69,7 +69,7 @@ case class ClientDriver(driver: Driver) extends LazyLogging {
     */
   def clean(): Unit = control(CleanCache(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
-private[webdriver] trait WebBodyMethod {
+private[webdriver] trait WebBodyMethod extends LazyLogging{
   protected val webBody: WebBody
   /**
     * Invoke FindElement on the server and return a stub of an element.
@@ -121,6 +121,8 @@ case class ClientWindow(window: Window) extends WebBodyMethod {
     */
   val handle = window.handle
   protected val webBody: WebBody = window
+
+  def close():Unit= control(CloseWindow(window)) collect { case f: Success => logger.trace(f.msg) }
 }
 
 case class ClientElement(element: Element) extends WebBodyMethod with LazyLogging {

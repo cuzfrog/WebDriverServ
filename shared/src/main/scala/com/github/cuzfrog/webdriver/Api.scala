@@ -22,6 +22,7 @@ private[webdriver] trait Api {
   def click(element: Element): Unit
   def getAttr(element: Element, attr: String): String
   def getText(element: Element): String
+  def closeWindow(window: Window):Unit
 
   //driver:
   def kill(driver: Driver): Long
