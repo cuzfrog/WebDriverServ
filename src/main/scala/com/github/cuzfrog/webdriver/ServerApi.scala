@@ -79,12 +79,10 @@ private[webdriver] class ServerApi extends Api {
     }]find element failed, because there is no attr pairs set.")
     val (firstAttr, firstValue, _) = attrPairs.head
     val elementsFromDriver = helperFindElements(webBody, firstAttr, firstValue)
-
+    val pairs = attrPairs.map { e => (e._1, e._2) }
     def recursivelyFilter(atPr: Seq[(String, String, (String, String) => Boolean)], elesToFilter: Seq[Element]): Element = {
       if (elesToFilter.isEmpty)
-        throw new NoSuchElementException(s"[${
-          webBody.driver.name
-        }]Cannot find element with:attrPairs")
+        throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:$pairs")
       if (atPr.isEmpty) elesToFilter.head
       else {
         val (at, v, f) = atPr.head

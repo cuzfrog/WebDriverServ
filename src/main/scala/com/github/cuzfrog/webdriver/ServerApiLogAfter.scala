@@ -35,8 +35,14 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${webBody.driver.name}]find elements:${elements.map(_._id)} by[attr=$attr,value=$value]")
     elements
   }
+  override def findElementEx(webBody: WebBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]): Element = {
+    val element = super.findElementEx(webBody, attrPairs)
+    val pairs=attrPairs.map{e=> (e._1,e._2)}
+    logger.debug(s"[${webBody.driver.name}]find element:${element._id} by attr pairs:[$pairs]")
+    element
+  }
   abstract override def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean = {
-    val result=super.checkElementExistence(webBody,attr,value)
+    val result = super.checkElementExistence(webBody, attr, value)
     logger.debug(s"[${webBody.driver.name}]check element by[attr=$attr,value=$value],is existing?$result")
     result
   }
@@ -82,7 +88,7 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${element.driver.name}]get text")
     value
   }
-  abstract override def closeWindow(window: Window): Unit={
+  abstract override def closeWindow(window: Window): Unit = {
     super.closeWindow(window)
     logger.debug(s"[${window.driver.name}]close window:${window.title}")
   }
