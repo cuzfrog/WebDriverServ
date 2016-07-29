@@ -48,6 +48,9 @@ private[webdriver] case class FindElement(webBody: WebBody, attr: String, value:
 private[webdriver] case class FindElements(webBody: WebBody, attr: String, value: String) extends Request {
   def execute(api: Api) = Ready[Seq[Element]](api.findElements(webBody, attr, value))
 }
+private[webdriver] case class FindElementEx(webBody: WebBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]) extends Request {
+  def execute(api: Api) = Ready[Element](api.findElementEx(webBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]))
+}
 private[webdriver] case class CheckElementExistence(webBody: WebBody, attr: String, value: String) extends Request {
   def execute(api: Api) = Ready[Boolean](api.checkElementExistence(webBody, attr, value))
 }

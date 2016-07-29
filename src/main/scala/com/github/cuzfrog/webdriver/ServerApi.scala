@@ -63,14 +63,39 @@ private[webdriver] class ServerApi extends Api {
 
   override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
-  override def findElement(webBody: WebBody, attr: String, value: String): Element = try {
-    helperFindElements(webBody, attr, value).head
-  } catch {
-    case e: NoSuchElementException =>
-      throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:attr:$attr ,value:$value")
+  override def findElement(webBody: WebBody, attr: String, value: String): Element = {
+    helperFindElements(webBody, attr, value) match {
+      case Nil => throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:attr:$attr ,value:$value")
+      case seq => seq.head
+    }
   }
+
   override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
     helperFindElements(webBody, attr, value)
+  }
+  override def findElementEx(webBody: WebBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]): Element = {
+    require(attrPairs.nonEmpty, s"[${
+      webBody.driver.name
+    }]find element failed, because there is no attr pairs set.")
+    val (firstAttr, firstValue, _) = attrPairs.head
+    val elementsFromDriver = helperFindElements(webBody, firstAttr, firstValue)
+
+    def recursivelyFilter(atPr: Seq[(String, String, (String, String) => Boolean)], elesToFilter: Seq[Element]): Element = {
+      if (elesToFilter.isEmpty)
+        throw new NoSuchElementException(s"[${
+          webBody.driver.name
+        }]Cannot find element with:attrPairs")
+      if (atPr.isEmpty) elesToFilter.head
+      else {
+        val (at, v, f) = atPr.head
+        val elesLeft = elesToFilter.filter {
+          e =>
+            f(e.getAttribute(at), v) //apply custom interaction function
+        }
+        recursivelyFilter(atPr.tail, elesLeft)
+      }
+    }
+    recursivelyFilter(attrPairs.tail, elementsFromDriver)
   }
   private def helperFindElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
     val by = toBy(attr, value)
@@ -83,14 +108,15 @@ private[webdriver] class ServerApi extends Api {
       }
       case WindowContainer(window, sd) => sd.switchTo().window(window.handle).findElements(by)
     }
-    val elements = sEles.map { sEle =>
-      val ele = sEle.getTagName.toLowerCase match {
-        case "frame" | "iframe" => Frame(newId, container.driver)
-        case _ => CommonElement(newId, container.driver)
-      }
-      repository.put(ele._id, ElementContainer(ele, sEle))
-      getDriverContainer(container.driver).elements += ele._id
-      ele
+    val elements = sEles.map {
+      sEle =>
+        val ele = sEle.getTagName.toLowerCase match {
+          case "frame" | "iframe" => Frame(newId, container.driver)
+          case _ => CommonElement(newId, container.driver)
+        }
+        repository.put(ele._id, ElementContainer(ele, sEle))
+        getDriverContainer(container.driver).elements += ele._id
+        ele
     }
     elements.toList
   }
@@ -146,8 +172,9 @@ private[webdriver] class ServerApi extends Api {
     val dc = getDriverContainer(driver)
     val webDriver = dc.seleniumDriver
     val windowHandles = webDriver.getWindowHandles
-    windowHandles.map { windowHandle =>
-      createRegisterWindow(dc, driver, webDriver, windowHandle)
+    windowHandles.map {
+      windowHandle =>
+        createRegisterWindow(dc, driver, webDriver, windowHandle)
     }.toList
   }
   private def createRegisterWindow(dc: DriverContainer, driver: Driver, webDriver: WebDriver, windowHandle: String) = {

@@ -62,14 +62,14 @@ case class ClientDriver(driver: Driver) extends LazyLogging {
     * Clean all associated elements in server repository. <br><br>
     * Every time invoking a WebDriver method to return a web body will register to the repository,
     * these will not be cleaned automatically. Common practice to clean the cache is:<br>
-    *   1.when retrieving the driver, since you probably need to do the work again.<br>
-    *   2.before switch to a new window or something that you won't use any elements grabbed earlier.
+    * 1.when retrieving the driver, since you probably need to do the work again.<br>
+    * 2.before switch to a new window or something that you won't use any elements grabbed earlier.
     *
     * @return number of elements cleaned.
     */
   def clean(): Unit = control(CleanCache(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
-private[webdriver] trait WebBodyMethod extends LazyLogging{
+private[webdriver] trait WebBodyMethod extends LazyLogging {
   protected val webBody: WebBody
   /**
     * Invoke FindElement on the server and return a stub of an element.
@@ -94,6 +94,18 @@ private[webdriver] trait WebBodyMethod extends LazyLogging{
       case None => Nil
     }
   }
+  /**
+    * Invoke a series of associated methods on the server and return a stub of an element.<br><br>
+    * First invoke findElements and filter them by attribute pairs, until either there's no element left
+    * or reaching the exhaustion of the attribute pairs.
+    *
+    * @param attrPairs a sequence of Tuple3(attribute,value,interaction function)<br>
+    *                  the interaction function: (actual attribute value, the value specified)=> Boolean
+    * @return the stub of the element that satisfies the filter.
+    */
+  def findElement(attrPairs: Seq[(String, String, (String, String) => Boolean)]): Option[ClientElement] =
+    control(FindElementEx(webBody, attrPairs)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data) }
+
   /**
     * Check if an element exists. This method is different from findElement for it does not wait for the the element.
     *
@@ -122,7 +134,7 @@ case class ClientWindow(window: Window) extends WebBodyMethod {
   val handle = window.handle
   protected val webBody: WebBody = window
 
-  def close():Unit= control(CloseWindow(window)) collect { case f: Success => logger.trace(f.msg) }
+  def close(): Unit = control(CloseWindow(window)) collect { case f: Success => logger.trace(f.msg) }
 }
 
 case class ClientElement(element: Element) extends WebBodyMethod with LazyLogging {
