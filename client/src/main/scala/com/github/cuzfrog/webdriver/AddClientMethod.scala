@@ -59,7 +59,11 @@ case class ClientDriver(driver: Driver) extends LazyLogging {
     */
   def kill(): Unit = control(Kill(driver)) collect { case f: Success => logger.trace(f.msg) }
   /**
-    * Clean all associated elements in server repository.
+    * Clean all associated elements in server repository. <br><br>
+    * Every time invoking a WebDriver method to return a web body will register to the repository,
+    * these will not be cleaned automatically. Common practice to clean the cache is:<br>
+    *   1.when retrieving the driver, since you probably need to do the work again.<br>
+    *   2.before switch to a new window or something that you won't use any elements grabbed earlier.
     *
     * @return number of elements cleaned.
     */

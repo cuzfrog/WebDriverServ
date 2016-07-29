@@ -51,7 +51,7 @@ private[webdriver] class Service extends Actor with LazyLogging {
         r.execute(api)
       } catch {
         case e: Exception =>
-          logger.debug(s"Response Failed with exception:$e")
+          logger.debug(s"Response Failed with exception:${e.getClass.getName}")
           Failed(e.getMessage, r)
       }
       sender ! response

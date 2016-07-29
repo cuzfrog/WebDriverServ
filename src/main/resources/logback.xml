@@ -15,7 +15,7 @@
 
     <logger name="ch.qos.logback" level="OFF" additivity="false"/>
     <logger name="com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl" level="OFF" additivity="false"/>
-    <logger name="akka.remote.Remoting" level="OFF" additivity="false"/>
+    <logger name="akka.remote" level="OFF" additivity="false"/>
     <logger name="akka.event.slf4j.Slf4jLogger" level="OFF" additivity="false"/>
 
 </configuration>
