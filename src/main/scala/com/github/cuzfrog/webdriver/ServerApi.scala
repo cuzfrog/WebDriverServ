@@ -10,7 +10,6 @@ import org.openqa.selenium.{JavascriptExecutor, WebDriver, WebElement}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.TimeoutException
 
 /**
   * Not thread safe, should be accessed within actor. Exceptions are handled in actor.
@@ -65,12 +64,15 @@ private[webdriver] class ServerApi extends Api {
   override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
   override def findElement(webBody: WebBody, attr: String, value: String): Element = try {
-    findElements(webBody, attr, value).head
+    helperFindElements(webBody, attr, value).head
   } catch {
     case e: NoSuchElementException =>
       throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:attr:$attr ,value:$value")
   }
   override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
+    helperFindElements(webBody, attr, value)
+  }
+  private def helperFindElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
     val by = toBy(attr, value)
     val container = repository(webBody._id)
     val sEles = container match {
@@ -92,6 +94,7 @@ private[webdriver] class ServerApi extends Api {
     }
     elements.toList
   }
+
   override def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean = try {
     val by = toBy(attr, value)
     new WebDriverWait(webBody.driver, 0).until(ExpectedConditions.presenceOfElementLocated(by))

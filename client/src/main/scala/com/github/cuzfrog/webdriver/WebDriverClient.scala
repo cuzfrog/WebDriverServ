@@ -29,12 +29,13 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
     val response = Await.result(tcpResponse, timeoutSec seconds)
 
     response match {
-      case Failed(msg) => logger.debug(s"Server: failed-$msg"); None
+      case Failed(msg, r) =>
+        logger.debug(s"Server: failed request:$r exception msg:${System.lineSeparator}$msg"); None
       case _ => Some(response)
     }
 
   } catch {
-    case e: TimeoutException=>
+    case e: TimeoutException =>
       logger.debug("Server connection time out.")
       None
     case e: Exception =>

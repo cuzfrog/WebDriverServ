@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "org.seleniumhq.selenium" % "selenium-java" % "2.53.1",
   "com.typesafe.akka" %% "akka-actor" % "2.4.8",
   "com.typesafe.akka" %% "akka-remote" % "2.4.8",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.4.8",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "ch.qos.logback" % "logback-classic" % "1.1.3"
 )

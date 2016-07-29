@@ -11,7 +11,7 @@ private[webdriver] case class NewDriver(name: String, typ: DriverTypes.DriverTyp
 private[webdriver] case class RetrieveDriver(name: String) extends Request {
   def execute(api: Api) = api.retrieveDriver(name) match {
     case Some(d) => Ready[Driver](d)
-    case None => Failed(s"No such driver[$name] on server.")
+    case None => Failed(s"No such driver[$name] on server.", this)
   }
 }
 private[webdriver] case class Kill(driver: Driver) extends Request {
@@ -89,6 +89,6 @@ private[webdriver] case object Shutdown extends Request {
 }
 
 private[webdriver] sealed trait Response extends Message
-private[webdriver] case class Failed(msg: String) extends Response
+private[webdriver] case class Failed(msg: String, request: Request) extends Response
 private[webdriver] case class Success(msg: String) extends Response
 private[webdriver] case class Ready[T](data: T) extends Response
