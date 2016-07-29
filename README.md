@@ -8,13 +8,17 @@ This is where this project comes in to hold driver instance in a standalone jvm.
 
 Current under development.
 
-####This project is written in Scala and includes two parts:
+###Feature:
+
+#####This project is written in Scala and includes two parts:
 
 1.A server that runs a Selenium WebDriver and accepts client instruction.
 
 2.A client which controls the server and is put in your code as dependency.
 
 Based on akka remoting.
+
+Add some convenient methods.
 
 ###How to Use:
 
@@ -35,20 +39,23 @@ Right now, you need to build for yourself or:
 ```scala
 
 object WebDriverClientTest extends App {
-  val host = "192.168.56.101:60001"
-  val driverName="test1"
-  val driver = WebDriverClient.retrieveDriver(host, driverName) match {
-    case s@Some(_) => s
-    case None => WebDriverClient.newDriver(host, driverName, DriverTypes.Chrome)
+  val driverName = "test1"
+  try {
+    val driver = WebDriverClient.retrieveDriver(driverName) match {
+      case s@Some(_) => s
+      case None => WebDriverClient.newDriver(driverName, DriverTypes.Chrome)
+    }
+
+    implicit def getOption[T](option: Option[T]): T = option.get
+    val window = driver.navigateTo("http://www.bing.com")
+    window.findElement("id", "sb_form_q").sendKeys("Juno mission")
+    window.findElement("id", "sb_form").submit()
+    window.executeJS("console.log('testJS')")
+
+    scala.io.StdIn.readLine("press any to shut down the client.....")
+  } finally {
+    WebDriverClient.shutdownClient()
   }
-
-  implicit def getOption[T](option: Option[T]): T = option.get
-  driver
-    .navigateTo("http://www.bing.com")
-    .findElement("someAttr", "value")
-
-  scala.io.StdIn.readLine("press any to shut down the client.....")
-  WebDriverClient.shutdownClient()
   //WebDriverClient.shutdownServer(host) //when necessary
 }
 
