@@ -27,17 +27,18 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
   }
   abstract override def findElement(webBody: WebBody, attr: String, value: String): Element = {
     val ele = super.findElement(webBody, attr, value)
-    logger.debug(s"[${
-      {
-        webBody.driver.name
-      }
-    }]find element:${ele._id} by[attr=$attr,value=$value]")
+    logger.debug(s"[${webBody.driver.name}]find element:${ele._id} by[attr=$attr,value=$value]")
     ele
   }
   abstract override def findElements(webBody: WebBody, attr: String, value: String): Seq[Element] = {
     val elements = super.findElements(webBody, attr, value)
     logger.debug(s"[${webBody.driver.name}]find elements:${elements.map(_._id)} by[attr=$attr,value=$value]")
     elements
+  }
+  abstract override def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean = {
+    val result=super.checkElementExistence(webBody,attr,value)
+    logger.debug(s"[${webBody.driver.name}]check element by[attr=$attr,value=$value],is existing?$result")
+    result
   }
   abstract override def executeJS(webBody: WebBody, script: String): Any = {
     val result = super.executeJS(webBody, script)
@@ -91,4 +92,5 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     super.shutdown()
     logger.debug(s"Server shutdown..")
   }
+
 }
