@@ -9,8 +9,8 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 private[webdriver] object Server extends App with LazyLogging {
-  System.setProperty("config.file","./application.conf")
-  val config=ConfigFactory.load
+  System.setProperty("config.file", "./application.conf")
+  val config = ConfigFactory.load
   System.setProperty("webdriver.chrome.driver", config.getString("webdriver.chrome.driver"))
   System.setProperty("webdriver.ie.driver", config.getString("webdriver.ie.driver"))
 
@@ -18,6 +18,7 @@ private[webdriver] object Server extends App with LazyLogging {
   private val system = ActorSystem("WebDriverServ")
   private val handler = system.actorOf(Props[Service], name = "handler")
   handler ! "initiation"
+
   import system.dispatcher
 
   //  while (true) {
@@ -40,7 +41,7 @@ private[webdriver] object Server extends App with LazyLogging {
 }
 
 private[webdriver] class Service extends Actor with LazyLogging {
-  val api=new ServerApi with ServerApiLogAfter
+  val api = new ServerApi with ServerApiLogAfter
 
   def receive = {
     case r: Request =>
@@ -49,12 +50,12 @@ private[webdriver] class Service extends Actor with LazyLogging {
         r.execute(api)
       } catch {
         case e: Exception =>
-          //e.printStackTrace()
+          logger.debug(s"Response Failed with exception:$e")
           Failed(e.getMessage)
       }
       sender ! response
-    case s:String =>
+    case s: String =>
       logger.debug(s"receive test mes.$s")
-      //sender ! "test msg received."
+    //sender ! "test msg received."
   }
 }

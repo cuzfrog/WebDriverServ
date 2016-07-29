@@ -22,7 +22,7 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
   }
   abstract override def retrieveDriver(name: String): Option[Driver] = {
     val result = super.retrieveDriver(name)
-    logger.debug(s"[$name]retrieve, result:$result")
+    logger.debug(s"[$name]try to retrieve driver, result:$result")
     result
   }
   abstract override def findElement(webBody: WebBody, attr: String, value: String): Element = {

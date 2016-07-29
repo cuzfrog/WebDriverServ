@@ -97,7 +97,7 @@ private[webdriver] class ServerApi extends Api {
     new WebDriverWait(webBody.driver, 0).until(ExpectedConditions.presenceOfElementLocated(by))
     true
   } catch {
-    case e: TimeoutException => false
+    case e: org.openqa.selenium.TimeoutException => false
   }
   override def executeJS(webBody: WebBody, script: String): Any = {
     webBody.driver.executeScript(script)
