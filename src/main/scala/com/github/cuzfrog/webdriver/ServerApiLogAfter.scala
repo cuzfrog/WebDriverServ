@@ -50,6 +50,10 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     super.sendKeys(element, keys)
     logger.debug(s"[${element.driver.name}]send keys[$keys] to element:${element._id}")
   }
+  abstract override def clearText(element: Element): Unit = {
+    super.clearText(element)
+    logger.debug(s"[${element.driver.name}]clear text of element:${element._id}")
+  }
   abstract override def submit(element: Element): Unit = {
     super.submit(element)
     logger.debug(s"[${element.driver.name}]submit element:${element._id}")
@@ -63,8 +67,8 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${driver.name}]be killed, repository body cleaned:$result")
     result
   }
-  abstract override def clean(driver: Driver): Long = {
-    val result = super.clean(driver)
+  abstract override def cleanCache(driver: Driver): Long = {
+    val result = super.cleanCache(driver)
     logger.debug(s"[${driver.name}]be cleaned, repository body cleaned:$result")
     result
   }

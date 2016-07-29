@@ -104,6 +104,7 @@ private[webdriver] class ServerApi extends Api {
   }
 
   override def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
+  override def clearText(element: Element): Unit = element.clear()
   override def submit(element: Element) = element.submit()
   override def click(element: Element) = element.click()
   override def kill(driver: Driver): Long = {
@@ -111,17 +112,17 @@ private[webdriver] class ServerApi extends Api {
     dc.seleniumDriver.quit()
     driverNameIndex.remove(driver.name)
     repository.remove(driver._id)
-    clean(dc.elements)
+    cleanCache(dc.elements)
   }
-  private def clean(elements: ArrayBuffer[Long]): Long = {
+  private def cleanCache(elements: ArrayBuffer[Long]): Long = {
     elements.foreach(repository.remove)
     val cnt = elements.length
     elements.clear()
     cnt
   }
-  override def clean(driver: Driver) = {
+  override def cleanCache(driver: Driver) = {
     val dc = repository(driver._id).asInstanceOf[DriverContainer]
-    clean(dc.elements)
+    cleanCache(dc.elements)
   }
   override def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
   override def getText(element: Element): String = element.getText
@@ -153,7 +154,7 @@ private[webdriver] class ServerApi extends Api {
     window
   }
 
-  def shutdown() = {
+  override def shutdown() = {
     repository.clear()
     driverNameIndex.foreach {
       _._2.quit()

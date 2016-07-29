@@ -20,9 +20,9 @@ private[webdriver] case class Kill(driver: Driver) extends Request {
     Success(s"Driver quit, $eleCnt elements cleaned.")
   }
 }
-private[webdriver] case class Clean(driver: Driver) extends Request {
+private[webdriver] case class CleanCache(driver: Driver) extends Request {
   def execute(api: Api) = {
-    val eleCnt = api.clean(driver)
+    val eleCnt = api.cleanCache(driver)
     Success(s"$eleCnt elements cleaned.")
   }
 }
@@ -57,6 +57,12 @@ private[webdriver] case class SendKeys(element: Element, keys: String) extends R
     Success("Keys sent.")
   }
 }
+private[webdriver] case class ClearText(element: Element) extends Request {
+  def execute(api: Api) = {
+    api.clearText(element)
+    Success("Submit")
+  }
+}
 private[webdriver] case class Submit(element: Element) extends Request {
   def execute(api: Api) = {
     api.submit(element)
@@ -86,10 +92,3 @@ private[webdriver] sealed trait Response extends Message
 private[webdriver] case class Failed(msg: String) extends Response
 private[webdriver] case class Success(msg: String) extends Response
 private[webdriver] case class Ready[T](data: T) extends Response
-
-//  case class ReadyDriver(driver: Driver) extends Response
-//  case class ReadyWindow(window: Window) extends Response
-//  case class ReadyWindows(windows: Seq[Window]) extends Response
-//  case class ReadyElement(element: Element) extends Response
-//  case class ReadyElements(elements: Seq[Element]) extends Response
-

@@ -63,7 +63,7 @@ case class ClientDriver(driver: Driver) extends LazyLogging {
     *
     * @return number of elements cleaned.
     */
-  def clean(): Unit = control(Clean(driver)) collect { case f: Success => logger.trace(f.msg) }
+  def clean(): Unit = control(CleanCache(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
 private[webdriver] trait WebBodyMethod {
   protected val webBody: WebBody
@@ -92,6 +92,7 @@ private[webdriver] trait WebBodyMethod {
   }
   /**
     * Check if an element exists. This method is different from findElement for it does not wait for the the element.
+    *
     * @param attr  which includes:id, name, tag, xpath, class/className, css/cssSelector, link and partialLink. Case insensitive.
     * @param value of the attr.
     * @return true if the element is present at this moment. Otherwise false, including error.
@@ -125,6 +126,10 @@ case class ClientElement(element: Element) extends WebBodyMethod with LazyLoggin
     * Send keys to the element. May fail.
     */
   def sendKeys(keys: String): Unit = control(SendKeys(element, keys)) collect { case f: Success => logger.trace(f.msg) }
+  /**
+    * Clear element text.
+    */
+  def clearText(): Unit = control(ClearText(element)) collect { case f: Success => logger.trace(f.msg) }
   /**
     * If this causes a web reload or refresh, reference to elements before this invocation will be invalid.
     */
