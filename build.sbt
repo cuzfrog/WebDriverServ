@@ -3,7 +3,7 @@ resolvers ++= Seq(
   "bintray-cuzfrog-maven" at "http://dl.bintray.com/cuzfrog/maven",
   "spray repo" at "http://repo.spray.io"
 )
-
+disablePlugins(RevolverPlugin)
 
 lazy val server = (project in file("./server")).dependsOn(shared)
   .settings(
@@ -61,4 +61,4 @@ releaseProcess := Seq[ReleaseStep](
 )
 releaseNextVersion := { ver => Version(ver).map(_.bumpBugfix.string).getOrElse(versionFormatError) }
 addCommandAlias("bumpVer", "release with-defaults")
-addCommandAlias("publish-local-client", ";client/publish-local;shared/publish-local")
+addCommandAlias("publish-local-client", ";bumpVer;client/publish-local;shared/publish-local")

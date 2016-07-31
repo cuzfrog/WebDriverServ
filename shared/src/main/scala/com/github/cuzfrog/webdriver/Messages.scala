@@ -48,8 +48,8 @@ private[webdriver] case class FindElement(webBody: WebBody, attr: String, value:
 private[webdriver] case class FindElements(webBody: WebBody, attr: String, value: String) extends Request {
   def execute(api: Api) = Ready[Seq[Element]](api.findElements(webBody, attr, value))
 }
-private[webdriver] case class FindElementEx(webBody: WebBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]) extends Request {
-  def execute(api: Api) = Ready[Element](api.findElementEx(webBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]))
+private[webdriver] case class FindElementEx(webBody: WebBody, attrPairs: List[(String, String)]) extends Request {
+  def execute(api: Api) = Ready[Element](api.findElementEx(webBody, attrPairs))
 }
 private[webdriver] case class CheckElementExistence(webBody: WebBody, attr: String, value: String) extends Request {
   def execute(api: Api) = Ready[Boolean](api.checkElementExistence(webBody, attr, value))
@@ -106,3 +106,4 @@ private[webdriver] sealed trait Response extends Message
 private[webdriver] case class Failed(msg: String, request: Request) extends Response
 private[webdriver] case class Success(msg: String) extends Response
 private[webdriver] case class Ready[T](data: T) extends Response
+

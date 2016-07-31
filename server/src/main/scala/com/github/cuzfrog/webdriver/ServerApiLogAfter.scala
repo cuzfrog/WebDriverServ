@@ -35,10 +35,9 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     logger.debug(s"[${webBody.driver.name}]find elements:${elements.map(_._id)} by[attr=$attr,value=$value]")
     elements
   }
-  override def findElementEx(webBody: WebBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]): Element = {
+  abstract override def findElementEx(webBody: WebBody, attrPairs: List[(String, String)]): Element = {
     val element = super.findElementEx(webBody, attrPairs)
-    val pairs=attrPairs.map{e=> (e._1,e._2)}
-    logger.debug(s"[${webBody.driver.name}]find element:${element._id} by attr pairs:[$pairs]")
+    logger.debug(s"[${webBody.driver.name}]find element:${element._id} by attr pairs:$attrPairs")
     element
   }
   abstract override def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean = {

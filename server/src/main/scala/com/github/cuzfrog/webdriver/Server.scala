@@ -13,8 +13,8 @@ private[webdriver] object Server extends App with LazyLogging {
   private val config = ConfigFactory.load
   System.setProperty("webdriver.chrome.driver", config.getString("webdriver.chrome.driver"))
   System.setProperty("webdriver.ie.driver", config.getString("webdriver.ie.driver"))
-  private val host=config.getString("akka.remote.netty.tcp.hostname")
-  private val port=config.getInt("akka.remote.netty.tcp.port")
+  private val host = config.getString("akka.remote.netty.tcp.hostname")
+  private val port = config.getInt("akka.remote.netty.tcp.port")
 
   private val system = ActorSystem("WebDriverServ")
   private val handler = system.actorOf(Props[Service], name = "handler")
@@ -55,8 +55,13 @@ private[webdriver] class Service extends Actor with LazyLogging {
           Failed(e.getMessage, r)
       }
       sender ! response
-    case s:String =>
+    case s: String =>
       logger.info(s)
     //sender ! "test msg received."
+    case other =>
+
+      logger.debug(other.toString)
+      logger.info(other.toString)
+      //sender ! other //send back
   }
 }

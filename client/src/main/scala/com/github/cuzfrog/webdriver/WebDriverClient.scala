@@ -8,7 +8,9 @@ import com.typesafe.scalalogging.LazyLogging
 import scala.concurrent.{Await, TimeoutException}
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
+import akka.pattern.ask
 
+import scala.reflect.ClassTag
 
 object WebDriverClient extends AddClientMethod with LazyLogging {
   private val config = ConfigFactory.load
@@ -22,7 +24,6 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
 
   // implicit execution context
   private[webdriver] def control(request: Request): Option[Response] = try {
-    import akka.pattern.ask
 
     Thread.sleep(actionIntervalMs)
     val tcpResponse = (remoteListener ? request).mapTo[Response]
@@ -41,5 +42,12 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
     case e: Exception =>
       logger.debug(e.getMessage)
       None
+  }
+
+  private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
+    def implicitPrint(implicit ev: ClassTag[_]) = println(s"ClassTag runtime class:${ev.runtimeClass}")
+    implicitPrint //println runtime class
+    val tcpResponse = (remoteListener ? msg).mapTo[T]
+    Await.result(tcpResponse, timeoutSec seconds)
   }
 }

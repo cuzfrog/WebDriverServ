@@ -14,7 +14,7 @@ private[webdriver] trait Api {
   //element and window:
   def findElement(webBody: WebBody, attr: String, value: String): Element
   def findElements(webBody: WebBody, attr: String, value: String): Seq[Element]
-  def findElementEx(webBody: WebBody, attrPairs: Seq[(String, String, (String, String) => Boolean)]):Element
+  def findElementEx(webBody: WebBody, attrPairs: List[(String, String)]): Element
   def checkElementExistence(webBody: WebBody, attr: String, value: String): Boolean
   def executeJS(webBody: WebBody, script: String): Any
   def sendKeys(element: Element, keys: String): Unit

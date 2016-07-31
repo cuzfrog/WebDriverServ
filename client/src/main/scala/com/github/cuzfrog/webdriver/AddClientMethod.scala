@@ -1,5 +1,7 @@
 package com.github.cuzfrog.webdriver
 
+import java.io.{ByteArrayOutputStream, ObjectOutputStream}
+
 import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 import com.github.cuzfrog.webdriver.WebDriverClient.control
 import com.typesafe.scalalogging.LazyLogging
@@ -103,8 +105,11 @@ private[webdriver] trait WebBodyMethod extends LazyLogging {
     *                  the interaction function: (actual attribute value, the value specified)=> Boolean
     * @return the stub of the element that satisfies the filter.
     */
-  def findElement(attrPairs: Seq[(String, String, (String, String) => Boolean)]): Option[ClientElement] =
+  def findElement(attrPairs: List[(String, String)]): Option[ClientElement] = {
+    val bo = new ByteArrayOutputStream()
+    new ObjectOutputStream(bo).writeObject(attrPairs)
     control(FindElementEx(webBody, attrPairs)) collect { case r: Ready[Element]@unchecked => ClientElement(r.data) }
+  }
 
   /**
     * Check if an element exists. This method is different from findElement for it does not wait for the the element.
