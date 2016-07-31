@@ -97,12 +97,11 @@ private[webdriver] trait WebBodyMethod extends LazyLogging {
     }
   }
   /**
-    * Invoke a series of associated methods on the server and return a stub of an element.<br><br>
+    * Invoke a series of findElement methods on the server and return a stub of an element.<br><br>
     * First invoke findElements and filter them by attribute pairs, until either there's no element left
     * or reaching the exhaustion of the attribute pairs.
     *
-    * @param attrPairs a sequence of Tuple3(attribute,value,interaction function)<br>
-    *                  the interaction function: (actual attribute value, the value specified)=> Boolean
+    * @param attrPairs a sequence of (attribute,value)<br>
     * @return the stub of the element that satisfies the filter.
     */
   def findElement(attrPairs: List[(String, String)]): Option[ClientElement] = {
