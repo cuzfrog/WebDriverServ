@@ -10,15 +10,18 @@ Current under development.
 
 ###Feature:
 
-#####This project is written in Scala and includes two parts:
+#####1.This project is written in Scala and includes two parts:
 
-1.A server that runs a Selenium WebDriver and accepts client instruction.
+A server that runs a Selenium WebDriver and accepts client instruction.
 
-2.A client which controls the server and is put in your code as dependency.
+A client which controls the server and is put in your code as dependency.
 
-Based on akka remoting.
+#####2.Based on akka remoting.
 
-Add some convenient methods.
+#####3.Add some convenient methods:
+
+a.auto switch to window or frame.
+
 
 ###How to Use:
 

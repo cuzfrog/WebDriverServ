@@ -1,6 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import java.io.{ByteArrayInputStream, ObjectInputStream}
 import java.util.concurrent.TimeUnit
 
 import com.github.cuzfrog.webdriver.DriverTypes.DriverType

@@ -61,4 +61,4 @@ releaseProcess := Seq[ReleaseStep](
 )
 releaseNextVersion := { ver => Version(ver).map(_.bumpBugfix.string).getOrElse(versionFormatError) }
 addCommandAlias("bumpVer", "release with-defaults")
-addCommandAlias("publish-local-client", ";bumpVer;client/publish-local;shared/publish-local")
+addCommandAlias("publishc", ";client/publish-local;shared/publish-local")
