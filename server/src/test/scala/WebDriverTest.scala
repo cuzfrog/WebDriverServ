@@ -7,4 +7,5 @@ import org.openqa.selenium.chrome.ChromeDriver
 object WebDriverTest {
   val driver:WebDriver=new ChromeDriver()
   val ele=driver.findElement(By.id("test1"))
+
 }

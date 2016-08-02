@@ -20,6 +20,9 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
   private val remoteListener = system.actorSelection(s"akka.tcp://WebDriverServ@$host/user/handler")
+
+  logger.debug(s"WebDriverClient started with configs:host:$host,timeout:$timeoutSec,actionInterval:$actionIntervalMs")
+
   def shutdownClient() = system.terminate()
 
   // implicit execution context
