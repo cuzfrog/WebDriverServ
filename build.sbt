@@ -3,6 +3,7 @@ resolvers ++= Seq(
   "bintray-cuzfrog-maven" at "http://dl.bintray.com/cuzfrog/maven",
   "spray repo" at "http://repo.spray.io"
 )
+licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
 disablePlugins(RevolverPlugin)
 
 lazy val server = (project in file("./server")).dependsOn(shared)
