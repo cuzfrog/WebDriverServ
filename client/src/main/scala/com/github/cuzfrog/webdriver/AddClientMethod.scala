@@ -128,7 +128,8 @@ private[webdriver] trait WebBodyMethod extends LazyLogging {
     * The driver has already switched to this frame or window.
     * This can also be used to inject script.
     */
-  def executeJS(script: String, args: AnyRef*): Option[Any] = control(ExecuteJS(webBody, script, args))
+  def executeJS(script: String, args: AnyRef*): Option[Any] =
+    control(ExecuteJS(webBody, script, args)) collect { case r: Ready[Any]@unchecked => r.data }
 }
 case class ClientWindow(window: Window) extends WebBodyMethod {
   val title = window.title
