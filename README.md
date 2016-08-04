@@ -30,15 +30,30 @@ like auto switch to window or frame.
 
 #####Start server:
 
-Provide a application.conf at run path, as above. Go to Selenium download associated driver. Start the server.
-
 Right now, you need to build for yourself:
 
 1.git clone
 
-2.sbt
+2.Go to [Selenium](http://www.seleniumhq.org/docs/03_webdriver.jsp#selenium-webdriver-s-drivers)
+download associated driver(you can find some of them in Selenium's wiki page.).
 
-3.change (or re-start, this command will trigger sbt-revolver to start the server)
+3.goto server/application.conf  find and change:
+
+```
+hostname = "your server ip"
+port = 60001
+webdriver {
+  chrome.driver = "driver exe path"
+  ie.driver = "driver exe path"
+}
+```
+
+4.enter sbt , change (or re-start, this command will trigger sbt-revolver to start the server)
+
+How to kill server:
+
+1.exit sbt  or  re-stop  will tell sbt-revolver to kill the jvm.
+2.from client call shutdownServer().
 
 #####Client code:
 
