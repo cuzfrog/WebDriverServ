@@ -1,3 +1,5 @@
+[![wercker status](https://app.wercker.com/status/762633d46c024b744891670f66d9339a/s "wercker status")](https://app.wercker.com/project/bykey/762633d46c024b744891670f66d9339a)
+
 # WebDriver Sever
 
 A server running Selenium WebDriver which is intended to reuse WebDriver instance.
