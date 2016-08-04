@@ -53,8 +53,10 @@ webdriver {
 
 How to kill server:
 
-1.exit sbt  or  re-stop  will tell sbt-revolver to kill the jvm.(Use hook to terminate driver process)
-2.from client call shutdownServer().
+1.exit sbt  or  re-stop  will tell sbt-revolver to kill the jvm.
+(Driver process will not be killed, shutdown hook not working.)
+
+2.call client shutdownServer() (Recommended).
 
 #####Client code:
 

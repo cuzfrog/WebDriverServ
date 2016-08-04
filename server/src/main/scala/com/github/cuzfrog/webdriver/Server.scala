@@ -16,14 +16,17 @@ private[webdriver] object Server extends App with LazyLogging {
   private val host = config.getString("akka.remote.netty.tcp.hostname")
   private val port = config.getInt("akka.remote.netty.tcp.port")
 
-  private val system = ActorSystem("WebDriverServ")
-  private val handler = system.actorOf(Props[Service], name = "handler")
+  private lazy val system = ActorSystem("WebDriverServ")
+  private lazy val handler = system.actorOf(Props[Service], name = "handler")
   handler ! s"Server Initiation: Remoting now listens on addresses: [akka.tcp://${system.name}@$host:$port]"
+
+  private[webdriver] lazy val api = new ServerApi with ServerApiLogAfter
 
   import system.dispatcher
 
-
   private[webdriver] def shutdown(): Unit = {
+    logger.info("Server is shutting down...")
+    api.shutdown()
     val terminated = system.terminate()
     val f = new PartialFunction[Terminated, Unit] {
       def apply(t: Terminated) = logger.info(s"Actor system terminated: $t")
@@ -35,19 +38,11 @@ private[webdriver] object Server extends App with LazyLogging {
 }
 
 private[webdriver] class Service extends Actor with LazyLogging {
-  val api = new ServerApi with ServerApiLogAfter
-
-  Runtime.getRuntime().addShutdownHook(new Thread() {
-    override def run()= {
-      api.shutdown()
-    }
-  })
-
   def receive = {
     case r: Request =>
       //logger.debug(s"Receive request: $r")
       val response: Response = try {
-        r.execute(api)
+        r.execute(Server.api)
       } catch {
         case e: Exception =>
           logger.debug(s"Response Failed with exception:$e")
@@ -61,6 +56,6 @@ private[webdriver] class Service extends Actor with LazyLogging {
 
       logger.debug(other.toString)
       logger.info(other.toString)
-      //sender ! other //send back
+    //sender ! other //send back
   }
 }
