@@ -1,10 +1,10 @@
 # WebDriver Sever
 
-Go [A list of headless browsers](http://www.asad.pw/HeadlessBrowsers/), see if you have a better choice.
-
 A server running Selenium WebDriver which is intended to reuse WebDriver instance.
 When developing or debugging with WebDriver, we sometimes want to stay to the very page which can only be accessed by the driver who created it.
 This is where this project comes in to hold driver instance in a standalone jvm.
+
+If you are doing something alike, go [A list of headless browsers](http://www.asad.pw/HeadlessBrowsers/), see if you have a better choice.
 
 Current under development.
 
@@ -20,16 +20,19 @@ A client which controls the server and is put in your code as dependency.
 
 #####3.Add some convenient methods:
 
-a.auto switch to window or frame.
+like auto switch to window or frame.
 
+#####4.Use typesafe Config. You can easily setup test environment.
+
+#####5.Fine-tuned server logging and complete client document.
 
 ###How to Use:
 
-####Start server:
+#####Start server:
 
 Provide a application.conf at run path, as above. Go to Selenium download associated driver. Start the server.
 
-Right now, you need to build for yourself or:
+Right now, you need to build for yourself:
 
 1.git clone
 
@@ -37,8 +40,15 @@ Right now, you need to build for yourself or:
 
 3.change (or re-start, this command will trigger sbt-revolver to start the server)
 
-####Client code:
+#####Client code:
 
+1.sbt publishc  (as you have cloned the whole project, this will publish client into your local repository.)
+
+2.add client dependency to your project:
+
+        "com.github.cuzfrog" %% "webdriver-client" % "some version"
+
+3.code:
 ```scala
 
 object WebDriverClientTest extends App {
@@ -61,5 +71,6 @@ object WebDriverClientTest extends App {
   }
   //WebDriverClient.shutdownServer(host) //when necessary
 }
-
 ```
+
+
