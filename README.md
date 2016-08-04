@@ -42,6 +42,7 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 ```
 hostname = "your server ip"
 port = 60001
+
 webdriver {
   chrome.driver = "driver exe path"
   ie.driver = "driver exe path"
@@ -52,7 +53,7 @@ webdriver {
 
 How to kill server:
 
-1.exit sbt  or  re-stop  will tell sbt-revolver to kill the jvm.
+1.exit sbt  or  re-stop  will tell sbt-revolver to kill the jvm.(Use hook to terminate driver process)
 2.from client call shutdownServer().
 
 #####Client code:

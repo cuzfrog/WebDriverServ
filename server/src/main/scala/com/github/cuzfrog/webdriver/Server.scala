@@ -22,13 +22,6 @@ private[webdriver] object Server extends App with LazyLogging {
 
   import system.dispatcher
 
-  //  while (true) {
-  //    val input = scala.io.StdIn.readLine()
-  //    input match {
-  //      case "exit" | "quit" | "shutdown" => shutdown()
-  //      case c => println(s"Bad command:$c")
-  //    }
-  //  }
 
   private[webdriver] def shutdown(): Unit = {
     val terminated = system.terminate()
@@ -43,6 +36,12 @@ private[webdriver] object Server extends App with LazyLogging {
 
 private[webdriver] class Service extends Actor with LazyLogging {
   val api = new ServerApi with ServerApiLogAfter
+
+  Runtime.getRuntime().addShutdownHook(new Thread() {
+    override def run()= {
+      api.shutdown()
+    }
+  })
 
   def receive = {
     case r: Request =>
