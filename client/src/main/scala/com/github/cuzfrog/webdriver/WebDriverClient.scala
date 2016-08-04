@@ -13,7 +13,7 @@ import akka.pattern.ask
 import scala.reflect.ClassTag
 
 object WebDriverClient extends AddClientMethod with LazyLogging {
-  private val config = ConfigFactory.load
+  private val config = ConfigFactory.load.withFallback(ConfigFactory.load("reference.conf"))
   private val host = config.getString("webdriver.client.host")
   private val timeoutSec = config.getInt("webdriver.client.timeout")
   private val actionIntervalMs = config.getInt("webdriver.client.action-interval")
