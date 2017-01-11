@@ -48,7 +48,8 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
   }
 
   private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
-    def implicitPrint(implicit ev: ClassTag[_]) = println(s"ClassTag runtime class:${ev.runtimeClass}")
+    def implicitPrint(implicit ev: ClassTag[_]) =
+      logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass}")
     implicitPrint //println runtime class
     val tcpResponse = (remoteListener ? msg).mapTo[T]
     Await.result(tcpResponse, timeoutSec seconds)

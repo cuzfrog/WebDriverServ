@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
+import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import org.openqa.selenium.{JavascriptExecutor, WebDriver, WebElement}
 
@@ -49,12 +50,16 @@ private[webdriver] class ServerApi extends Api {
 
   override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
     val webDriver = typ match {
-      case DriverTypes.IE => new InternetExplorerDriver()
+      case DriverTypes.IE =>
+        val capabilities = DesiredCapabilities.internetExplorer()
+        capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true)
+        new InternetExplorerDriver(capabilities)
       case DriverTypes.Chrome => new ChromeDriver()
       case DriverTypes.FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
       case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
-    webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS) //implicit waiting
+    webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS)
+    //implicit waiting
     val driver = Driver(newId, name)
     repository.put(driver._id, DriverContainer(driver, webDriver))
     driverNameIndex.put(name, driver)
@@ -125,10 +130,10 @@ private[webdriver] class ServerApi extends Api {
     webBody.driver.executeScript(script)
   }
 
-  override def sendKeys(element: Element, keys: String) = element.sendKeys(keys)
+  override def sendKeys(element: Element, keys: String): Unit = element.sendKeys(keys)
   override def clearText(element: Element): Unit = element.clear()
-  override def submit(element: Element) = element.submit()
-  override def click(element: Element) = element.click()
+  override def submit(element: Element): Unit = element.submit()
+  override def click(element: Element): Unit = element.click()
   override def kill(driver: Driver): Long = {
     val dc = repository(driver._id).asInstanceOf[DriverContainer]
     dc.seleniumDriver.quit()
@@ -142,7 +147,7 @@ private[webdriver] class ServerApi extends Api {
     elements.clear()
     cnt
   }
-  override def cleanCache(driver: Driver) = {
+  override def cleanCache(driver: Driver): Long = {
     val dc = repository(driver._id).asInstanceOf[DriverContainer]
     cleanCache(dc.elements)
   }
@@ -178,7 +183,7 @@ private[webdriver] class ServerApi extends Api {
     window
   }
 
-  override def shutdown() = {
+  override def shutdown(): Unit = {
     repository.clear()
     driverNameIndex.foreach {
       _._2.quit()

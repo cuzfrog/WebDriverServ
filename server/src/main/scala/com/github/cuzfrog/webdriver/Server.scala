@@ -50,7 +50,7 @@ private[webdriver] class Handler extends Actor with LazyLogging {
       }
       sender ! response
     case s: String =>
-      logger.info(s)
+      logger.info(s"[bounced]$s.")
       sender ! s"[bounced]$s."
     case other =>
       logger.info(s"Unknow msg received:[$other]")
