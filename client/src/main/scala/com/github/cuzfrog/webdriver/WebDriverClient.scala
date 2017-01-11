@@ -1,11 +1,11 @@
 package com.github.cuzfrog.webdriver
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.concurrent.{Await, TimeoutException}
+import scala.concurrent.{Await, Future, TimeoutException}
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 import akka.pattern.ask
@@ -23,7 +23,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
 
   logger.debug(s"WebDriverClient started with configs:host:$host,timeout:$timeoutSec,actionInterval:$actionIntervalMs")
 
-  def shutdownClient() = system.terminate()
+  def shutdownClient(): Future[Terminated] = system.terminate()
 
   // implicit execution context
   private[webdriver] def control(request: Request): Option[Response] = try {
