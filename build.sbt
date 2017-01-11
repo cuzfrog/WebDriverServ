@@ -17,7 +17,7 @@ lazy val server = (project in file("./server")).dependsOn(shared)
       "com.typesafe.akka" %% "akka-remote" % "2.4.8",
       "com.typesafe.akka" %% "akka-slf4j" % "2.4.8",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
-      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided"
+      "ch.qos.logback" % "logback-classic" % "1.1.7"
     ),
     reColors := Seq("magenta"),
     mainClass in reStart := Some("com.github.cuzfrog.webdriver.Server")
