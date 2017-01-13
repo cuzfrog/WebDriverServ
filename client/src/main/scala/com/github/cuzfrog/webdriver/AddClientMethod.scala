@@ -30,10 +30,15 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
     * Send shutdown command to the server.
     */
   def shutdownServer(): Unit = control(Shutdown) collect { case f: Success => logger.trace(f.msg) }
+
+
+  def textParse(text: String, parser: String => String): Option[String] = {
+    control(TextParse(text, parser)).collect { case Success(t) => t }
+  }
 }
 
 case class ClientDriver(driver: Driver) extends LazyLogging {
-  val name = driver.name
+  val name: String = driver.name
 
   /**
     * @param url to navigate.
@@ -47,7 +52,7 @@ case class ClientDriver(driver: Driver) extends LazyLogging {
     * @return sequence of windows.
     */
   def getWindows: Seq[ClientWindow] = {
-    control(GetWindows(driver)) collect { case r: Ready[Seq[Window]]@unchecked => r.data.map(ClientWindow(_)) } match {
+    control(GetWindows(driver)) collect { case r: Ready[Seq[Window]]@unchecked => r.data.map(ClientWindow) } match {
       case Some(s) => s
       case None => Nil
     }
@@ -91,7 +96,7 @@ private[webdriver] trait WebBodyMethod extends LazyLogging {
     * @return An Seq of elements, when empty it be Nil.
     */
   def findElements(attr: String, value: String): Seq[ClientElement] = {
-    control(FindElements(webBody, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement(_)) } match {
+    control(FindElements(webBody, attr, value)) collect { case r: Ready[Seq[Element]]@unchecked => r.data.map(ClientElement) } match {
       case Some(s) => s
       case None => Nil
     }
@@ -132,11 +137,11 @@ private[webdriver] trait WebBodyMethod extends LazyLogging {
     control(ExecuteJS(webBody, script, args)) collect { case r: Ready[Any]@unchecked => r.data }
 }
 case class ClientWindow(window: Window) extends WebBodyMethod {
-  val title = window.title
+  val title: String = window.title
   /**
     * Equal with windowHandle of the driver on server.
     */
-  val handle = window.handle
+  val handle: String = window.handle
   protected val webBody: WebBody = window
 
   def close(): Unit = control(CloseWindow(window)) collect { case f: Success => logger.trace(f.msg) }

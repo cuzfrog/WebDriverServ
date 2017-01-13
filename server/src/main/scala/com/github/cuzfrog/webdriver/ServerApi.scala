@@ -190,5 +190,8 @@ private[webdriver] class ServerApi extends Api {
     }
     Server.shutdown()
   }
-
+  //client-test:
+  override def textParse(text: String, parser: (String) => String): String = {
+    parser(text)
+  }
 }

@@ -10,6 +10,9 @@ private[webdriver] trait Api {
   def newDriver(name: String, typ: DriverType, waitSec: Int = 10): Driver
   def retrieveDriver(name: String): Option[Driver]
   def shutdown(): Unit
+  //client-test:
+  def textParse(text: String, parser: String => String): String
+
 
   //element and window:
   def findElement(webBody: WebBody, attr: String, value: String): Element

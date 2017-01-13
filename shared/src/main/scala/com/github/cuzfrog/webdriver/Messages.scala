@@ -9,97 +9,119 @@ private[webdriver] sealed trait Message {
 private[webdriver] sealed trait Request extends Message {
   def execute(api: Api): Response
 }
+
 private[webdriver] case class NewDriver(name: String, typ: DriverTypes.DriverType, waitSec: Int) extends Request {
-  def execute(api: Api) = Ready[Driver](api.newDriver(name, typ, waitSec))
+  def execute(api: Api): Ready[Driver] = Ready[Driver](api.newDriver(name, typ, waitSec))
 }
+
 private[webdriver] case class RetrieveDriver(name: String) extends Request {
-  def execute(api: Api) = api.retrieveDriver(name) match {
+  def execute(api: Api): Response = api.retrieveDriver(name) match {
     case Some(d) => Ready[Driver](d)
     case None => Failed(s"No such driver[$name] on server.", this)
   }
 }
+
 private[webdriver] case class Kill(driver: Driver) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     val eleCnt = api.kill(driver)
     Success(s"Driver quit, $eleCnt elements cleaned.")
   }
 }
+
 private[webdriver] case class CleanCache(driver: Driver) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     val eleCnt = api.cleanCache(driver)
     Success(s"$eleCnt elements cleaned.")
   }
 }
+
 private[webdriver] case class Navigate(driver: Driver, url: String) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Ready[Window] = {
     val window = api.navigateTo(driver, url)
     Ready(window)
   }
 }
+
 private[webdriver] case class GetWindow(driver: Driver) extends Request {
-  def execute(api: Api) = Ready[Window](api.getWindow(driver))
+  def execute(api: Api): Ready[Window] = Ready[Window](api.getWindow(driver))
 }
+
 private[webdriver] case class GetWindows(driver: Driver) extends Request {
-  def execute(api: Api) = Ready[Seq[Window]](api.getWindows(driver))
+  def execute(api: Api): Ready[Seq[Window]] = Ready[Seq[Window]](api.getWindows(driver))
 }
+
 private[webdriver] case class FindElement(webBody: WebBody, attr: String, value: String) extends Request {
-  def execute(api: Api) = Ready[Element](api.findElement(webBody, attr, value))
+  def execute(api: Api): Ready[Element] = Ready[Element](api.findElement(webBody, attr, value))
 }
+
 private[webdriver] case class FindElements(webBody: WebBody, attr: String, value: String) extends Request {
-  def execute(api: Api) = Ready[Seq[Element]](api.findElements(webBody, attr, value))
+  def execute(api: Api): Ready[Seq[Element]] = Ready[Seq[Element]](api.findElements(webBody, attr, value))
 }
+
 private[webdriver] case class FindElementEx(webBody: WebBody, attrPairs: List[(String, String)]) extends Request {
-  def execute(api: Api) = Ready[Element](api.findElementEx(webBody, attrPairs))
+  def execute(api: Api): Ready[Element] = Ready[Element](api.findElementEx(webBody, attrPairs))
 }
+
 private[webdriver] case class CheckElementExistence(webBody: WebBody, attr: String, value: String) extends Request {
-  def execute(api: Api) = Ready[Boolean](api.checkElementExistence(webBody, attr, value))
+  def execute(api: Api): Ready[Boolean] = Ready[Boolean](api.checkElementExistence(webBody, attr, value))
 }
+
 private[webdriver] case class ExecuteJS(webBody: WebBody, script: String, args: AnyRef*) extends Request {
-  def execute(api: Api) = Ready[Any](api.executeJS(webBody, script))
+  def execute(api: Api): Ready[Any] = Ready[Any](api.executeJS(webBody, script))
 }
 
 private[webdriver] case class SendKeys(element: Element, keys: String) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     api.sendKeys(element, keys)
     Success("Keys sent.")
   }
 }
+
 private[webdriver] case class ClearText(element: Element) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     api.clearText(element)
     Success(this)
   }
 }
+
 private[webdriver] case class Submit(element: Element) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     api.submit(element)
     Success(this)
   }
 }
+
 private[webdriver] case class Click(element: Element) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     api.click(element)
     Success(this)
   }
 }
+
 private[webdriver] case class GetAttr(element: Element, attr: String) extends Request {
   def execute(api: Api) = Success(api.getAttr(element, attr))
 }
+
 private[webdriver] case class GetText(element: Element) extends Request {
   def execute(api: Api) = Success(api.getText(element))
 }
+
 private[webdriver] case class CloseWindow(window: Window) extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     api.closeWindow(window)
     Success(this)
   }
 }
 
 private[webdriver] case object Shutdown extends Request {
-  def execute(api: Api) = {
+  def execute(api: Api): Success = {
     api.shutdown()
     Success("Server shutdown.")
   }
+}
+
+private[webdriver] case class TextParse(text: String, parser: String => String) extends Request{
+  def execute(api: Api): Success = Success(api.textParse(text,parser))
 }
 
 private[webdriver] sealed trait Response extends Message

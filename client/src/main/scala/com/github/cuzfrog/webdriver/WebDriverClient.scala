@@ -40,7 +40,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
 
   } catch {
     case e: TimeoutException =>
-      logger.debug("Server connection time out.")
+      logger.debug(s"Server connection time out. Request[$request]")
       None
     case e: Exception =>
       logger.debug(e.getMessage)

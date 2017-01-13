@@ -15,7 +15,8 @@
 
     <logger name="ch.qos.logback" level="OFF" additivity="false"/>
     <logger name="com.gargoylesoftware.htmlunit.IncorrectnessListenerImpl" level="OFF" additivity="false"/>
-    <logger name="akka.remote" level="OFF" additivity="false"/>
-    <logger name="akka.event.slf4j.Slf4jLogger" level="OFF" additivity="false"/>
+    <logger name="akka.remote" level="WARN" additivity="true"/>
+    <logger name="akka.event.slf4j.Slf4jLogger" level="WARN" additivity="true"/>
+    <logger name="acom.github.cuzfrog.webdriver" level="TRACE" additivity="true"/>
 
 </configuration>
