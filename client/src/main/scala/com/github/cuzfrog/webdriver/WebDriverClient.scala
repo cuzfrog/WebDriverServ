@@ -19,7 +19,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
   private val actionIntervalMs = config.getInt("webdriver.client.action-interval")
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
-  private val remoteListener = system.actorSelection(s"akka.tcp://WebDriverServ@$host/user/handler")
+  private val remoteListener = system.actorSelection(s"akka://WebDriverServ@$host/user/handler")
 
   logger.debug(s"WebDriverClient started with configs:host:$host,timeout:$timeoutSec,actionInterval:$actionIntervalMs")
 

@@ -106,3 +106,11 @@ Client and server communication is based on Akka serialization of shared message
 Client stubs of drivers, windows and elements are actually IDs, seen by the server.
 On which a mutable Map is used as the repository to cache WebDriver instances.
 
+#####About closure serialization and sending:
+I noticed some discussions:
+http://stackoverflow.com/questions/15563746/akka-sending-a-closure-to-remote-actor
+http://www.scala-lang.org/old/node/10566
+etc..
+Akka document requests that closure sent to actor be avoided.
+However, if the message over the wire is truely immutable? which satisfies akka's requirement.
+
