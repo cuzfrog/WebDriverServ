@@ -49,7 +49,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
 
 
   //===================test and experimental=======================
-  object Experimental {
+  object ExperimentalAndTest {
     private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
       def implicitPrint(implicit ev: ClassTag[_]) =
         logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass}")
@@ -60,18 +60,21 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
     }
 
     private lazy val remoteAddress = AddressFromURIString(s"akka://WebDriverServ@$host")
-    private[webdriver] def deployActorToServer[T <: Actor : ClassTag](name:String): ActorRef = {
+    private[webdriver] def deployActorToServer[T <: Actor : ClassTag](name: String): ActorRef = {
       system.actorOf(Props[T].withDeploy(Deploy(scope = RemoteScope(remoteAddress))),
         name = name)
     }
 
-    private[webdriver] def sendMessgeTo(actor: ActorRef, msg: String): String = try {
+    private[webdriver] def sendMessageTo(actor: ActorRef, msg: String): String = try {
       Await.result((actor ? msg).mapTo[String], 5 seconds)
     } catch {
       case e: Exception =>
         e.printStackTrace()
         "failed."
     }
-    
+
+    private[webdriver] def sendParseLogic(parseLogic: String): Option[String] = {
+      control(GetInnerHtml(null, parseLogic)) collect { case r: Ready[String]@unchecked => r.data }
+    }
   }
 }

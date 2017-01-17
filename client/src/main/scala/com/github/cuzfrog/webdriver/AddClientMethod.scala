@@ -170,6 +170,9 @@ case class ClientElement(element: Element) extends WebBodyMethod with LazyLoggin
     */
   def getText: Option[String] = control(GetText(element)) collect { case f: Success => f.msg }
 
+
+  //def getInnerHtml(parserLogic:String): Option[Any] =
+  //control(GetInnerHtml(element,parser)) collect { case r:Ready[Any]@unchecked => r.data }
 }
 
 

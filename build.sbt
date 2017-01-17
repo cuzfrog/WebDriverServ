@@ -14,6 +14,7 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
     libraryDependencies ++= Seq(
       "org.seleniumhq.selenium" % "selenium-java" % "2.53.1",
       "com.typesafe.akka" %% "akka-slf4j" % "2.4.16",
+      "org.scala-lang" % "scala-compiler" % "2.11.8",
       "ch.qos.logback" % "logback-classic" % "1.1.7"
     ) ++ Settings.commonDependencies,
     reColors := Seq("magenta"),
@@ -25,8 +26,7 @@ lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
     name := "webdriver-client",
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided",
-      "org.scala-lang" % "scala-compiler" % "2.11.8"
+      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided"
     ) ++ Settings.commonDependencies
   )
   .disablePlugins(RevolverPlugin)

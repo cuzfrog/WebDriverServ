@@ -153,6 +153,12 @@ private[webdriver] class ServerApi extends Api {
   }
   override def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
   override def getText(element: Element): String = element.getText
+  override def getInnerHtml(element: Element, parseLogic: String): Any = {
+    val parser = RuntimeCompiler.compileLogic(parseLogic)
+    //parser.apply(element.getAttribute("innerHTML"))
+    parser.apply("some html")
+  }
+
   override def closeWindow(window: Window): Unit = window.driver.close()
 
   override def navigateTo(driver: Driver, url: String): Window = {
@@ -190,4 +196,5 @@ private[webdriver] class ServerApi extends Api {
     }
     Server.terminateActorSystem()
   }
+
 }

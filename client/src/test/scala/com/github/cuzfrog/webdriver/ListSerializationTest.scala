@@ -18,7 +18,7 @@ object ListSerializationTest extends App {
   val fun1 = new Fun
 
   try {
-    val response = WebDriverClient.Experimental.bounceTest(write(fun))
+    val response = WebDriverClient.ExperimentalAndTest.bounceTest(write(fun))
     print(response)
   } finally {
     Thread.sleep(3000)

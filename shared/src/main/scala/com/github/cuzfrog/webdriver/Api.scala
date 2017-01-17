@@ -24,6 +24,7 @@ private[webdriver] trait Api {
   def getAttr(element: Element, attr: String): String
   def getText(element: Element): String
   def closeWindow(window: Window): Unit
+  def getInnerHtml(element: Element, parseLogic: String): Any
 
   //driver:
   def kill(driver: Driver): Long
