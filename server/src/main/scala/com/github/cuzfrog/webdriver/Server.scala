@@ -19,9 +19,14 @@ private[webdriver] object Server extends App with LazyLogging {
 
   import system.dispatcher
 
-  private[webdriver] def shutdown(): Unit = {
+  /**
+    * Note: this method should not be called directly from Server, because
+    * it only terminates actor system and does not close web drivers.
+    * <br>
+    * Call Server.shutDown instead if a completed shutting down is required.
+    */
+  private[webdriver] def terminateActorSystem(): Unit = {
     logger.info("Server is shutting down...")
-    api.shutdown()
     val terminated = system.terminate()
     val f = new PartialFunction[Terminated, Unit] {
       def apply(t: Terminated): Unit = logger.info(s"Actor system terminated: $t")
@@ -30,6 +35,11 @@ private[webdriver] object Server extends App with LazyLogging {
     terminated.onSuccess(f)
     Await.result(terminated, 15 seconds)
   }
+
+  /**
+    * Shut down the server. Quit all web driver, clear caches and terminate actor system.
+    */
+  private[webdriver] def shutDown(): Unit = api.shutdown()
 }
 
 private[webdriver] class Handler extends Actor with LazyLogging {

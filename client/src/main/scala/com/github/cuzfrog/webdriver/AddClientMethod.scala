@@ -30,11 +30,6 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
     * Send shutdown command to the server.
     */
   def shutdownServer(): Unit = control(Shutdown) collect { case f: Success => logger.trace(f.msg) }
-
-
-  def textParse(text: String, parser: String => String): Option[String] = {
-    control(TextParse(text, parser)).collect { case Success(t) => t }
-  }
 }
 
 case class ClientDriver(driver: Driver) extends LazyLogging {

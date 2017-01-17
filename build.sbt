@@ -4,8 +4,10 @@ resolvers ++= Seq(
 )
 licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
 disablePlugins(RevolverPlugin)
+shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
+onLoad in Global := (onLoad in Global).value andThen (Command.process("project server", _))
 
-lazy val server = (project in file("./server")).dependsOn(shared)
+lazy val server = (project in file("./server")).dependsOn(shared % "test->test;compile->compile")
   .settings(Settings.commonSettings)
   .settings(
     name := "webdriver-server",
@@ -15,7 +17,7 @@ lazy val server = (project in file("./server")).dependsOn(shared)
       "ch.qos.logback" % "logback-classic" % "1.1.7"
     ) ++ Settings.commonDependencies,
     reColors := Seq("magenta"),
-    mainClass in reStart := Some("com.github.cuzfrog.webdriver.Server")
+    mainClass in Test in reStart := Some("com.github.cuzfrog.webdriver.Server")
   )
 
 lazy val client = (project in file("./client")).dependsOn(shared)
@@ -23,7 +25,8 @@ lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
     name := "webdriver-client",
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided"
+      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided",
+      "org.scala-lang" % "scala-compiler" % "2.11.8"
     ) ++ Settings.commonDependencies
   )
   .disablePlugins(RevolverPlugin)
@@ -33,12 +36,14 @@ lazy val shared = (project in file("./shared"))
   .settings(
     name := "webdriver-shared",
     libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-actor" % "2.4.16" % "provided",
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0" % "provided"
     )
   ).disablePlugins(RevolverPlugin)
 
 addCommandAlias("change", ";re-stop;re-start")
 
-//release:
+//====================release======================:
 import ReleaseTransformations._
 import sbtrelease._
 

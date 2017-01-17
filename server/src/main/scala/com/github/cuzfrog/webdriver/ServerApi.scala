@@ -188,10 +188,6 @@ private[webdriver] class ServerApi extends Api {
     driverNameIndex.foreach {
       _._2.quit()
     }
-    Server.shutdown()
-  }
-  //client-test:
-  override def textParse(text: String, parser: (String) => String): String = {
-    parser(text)
+    Server.terminateActorSystem()
   }
 }

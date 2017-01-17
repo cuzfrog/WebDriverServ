@@ -120,10 +120,6 @@ private[webdriver] case object Shutdown extends Request {
   }
 }
 
-private[webdriver] case class TextParse(text: String, parser: String => String) extends Request{
-  def execute(api: Api): Success = Success(api.textParse(text,parser))
-}
-
 private[webdriver] sealed trait Response extends Message
 private[webdriver] case class Failed(msg: String, request: Request) extends Response
 private[webdriver] case class Success(msg: String) extends Response

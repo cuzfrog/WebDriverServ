@@ -105,9 +105,4 @@ private[webdriver] trait ServerApiLogAfter extends Api with LazyLogging {
     super.shutdown()
     logger.debug(s"Server shutdown..")
   }
-
-  abstract override def textParse(text: String, parser: (String) => String): String = {
-    logger.debug(s"Server is parsing text:$text")
-    super.textParse(text, parser)
-  }
 }

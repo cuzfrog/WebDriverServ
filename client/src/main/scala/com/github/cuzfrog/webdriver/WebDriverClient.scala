@@ -1,15 +1,15 @@
 package com.github.cuzfrog.webdriver
 
-import akka.actor.{ActorSystem, Terminated}
+import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, Props, Terminated}
+import akka.pattern.ask
+import akka.remote.RemoteScope
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.concurrent.{Await, Future, TimeoutException}
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future, TimeoutException}
 import scala.language.postfixOps
-import akka.pattern.ask
-
 import scala.reflect.ClassTag
 
 object WebDriverClient extends AddClientMethod with LazyLogging {
@@ -47,11 +47,31 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
       None
   }
 
-  private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
-    def implicitPrint(implicit ev: ClassTag[_]) =
-      logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass}")
-    implicitPrint //println runtime class
-    val tcpResponse = (remoteListener ? msg).mapTo[T]
-    Await.result(tcpResponse, timeoutSec seconds)
+
+  //===================test and experimental=======================
+  object Experimental {
+    private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
+      def implicitPrint(implicit ev: ClassTag[_]) =
+        logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass}")
+      implicitPrint
+      //println runtime class
+      val tcpResponse = (remoteListener ? msg).mapTo[T]
+      Await.result(tcpResponse, timeoutSec seconds)
+    }
+
+    private lazy val remoteAddress = AddressFromURIString(s"akka://WebDriverServ@$host")
+    private[webdriver] def deployActorToServer[T <: Actor : ClassTag](name:String): ActorRef = {
+      system.actorOf(Props[T].withDeploy(Deploy(scope = RemoteScope(remoteAddress))),
+        name = name)
+    }
+
+    private[webdriver] def sendMessgeTo(actor: ActorRef, msg: String): String = try {
+      Await.result((actor ? msg).mapTo[String], 5 seconds)
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+        "failed."
+    }
+    
   }
 }
