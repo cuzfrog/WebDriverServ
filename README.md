@@ -113,5 +113,5 @@ http://www.scala-lang.org/old/node/10566
 etc..
 Akka document requests that closure sent to actor be avoided.
 However, if the message over the wire is truely immutable? which satisfies akka's requirement.
-`UPDATE:` Using runtime class loading, it's able to sending logic as String. But produce logic as
+`UPDATE:` Using runtime class loading, it's able to sending logic as String. But producing logic as
 String needs quite technique(macros).
