@@ -51,6 +51,7 @@ private[webdriver] class Handler extends Actor with LazyLogging {
       } catch {
         case e: Exception =>
           logger.debug(s"Response Failed with exception:$e")
+          e.printStackTrace()
           Failed(e.getMessage, r)
       }
       sender ! response

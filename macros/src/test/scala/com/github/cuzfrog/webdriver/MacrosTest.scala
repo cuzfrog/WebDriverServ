@@ -15,6 +15,7 @@ object MacrosTest {
     val q"${s_format: String}" = format
     val evals = ListBuffer[ValDef]()
 
+
     def precompute(value: Tree, tpe: Type): Ident = {
       val freshName = TermName(c.freshName("eval$"))
       evals += ValDef(Modifiers(), freshName, TypeTree(tpe), value)

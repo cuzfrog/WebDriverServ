@@ -102,16 +102,25 @@ Then navigate to www.bing.com and search "Juno mission")
 #####Mechanism:
 
 Client and server communication is based on Akka serialization of shared messages.
-(Closure is not easy to send over the tunnel, which requires sending class definition.)
+(Closure is not easy to send over the tunnel, which requires sending class definition.
+Described blow.)
 Client stubs of drivers, windows and elements are actually IDs, seen by the server.
 On which a mutable Map is used as the repository to cache WebDriver instances.
 
 #####About closure serialization and sending:
-I noticed some discussions:
-http://stackoverflow.com/questions/15563746/akka-sending-a-closure-to-remote-actor
-http://www.scala-lang.org/old/node/10566
-etc..
-Akka document requests that closure sent to actor be avoided.
-However, if the message over the wire is truely immutable? which satisfies akka's requirement.
-`UPDATE:` Using runtime class loading, it's able to sending logic as String. But producing logic as
-String needs quite technique(macros).
+Failed experiments:
+1. Trying to serialize closure itself, remote does not have class definition.
+2. Use macro to extract source/AST of function, send source to remote and compile at runtime.
+Macro cannot resolve reference to source automatically.
+
+__Ended up with solution:__
+Define function as .scala source file in resource directory(or wherever reachable). Read it as pure source, and send
+it to the remote server, then compiled.
+
+benefits:
+* Supported by IDE.
+* No requirement of complete class definition, code snippet is valid.
+* Support imports.(caveat: imports must be in the scope of the server.)
+
+
+

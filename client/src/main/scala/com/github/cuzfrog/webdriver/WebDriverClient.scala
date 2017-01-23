@@ -73,8 +73,8 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
         "failed."
     }
 
-    private[webdriver] def sendParseLogic(parseLogic: String): Option[String] = {
-      control(GetInnerHtml(null, parseLogic)) collect { case r: Ready[String]@unchecked => r.data }
+    private[webdriver] def sendParseLogic(funcSrcCode: String): Option[String] = {
+      control(GetInnerHtml(null, funcSrcCode)) collect { case r: Ready[String]@unchecked => r.data }
     }
   }
 }

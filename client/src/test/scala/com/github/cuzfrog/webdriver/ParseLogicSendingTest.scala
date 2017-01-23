@@ -7,11 +7,9 @@ object ParseLogicSendingTest extends App {
 
   import WebDriverClient.ExperimentalAndTest._
 
-  val logic = (in: String) => {
-    in + "987766"
-  }
+  val src = SourceReader.readSource("Func1")
 
-  println("received reply:" + sendParseLogic("""in + "123"  """))
+  println("received reply:" + sendParseLogic(src))
 
   WebDriverClient.shutdownClient()
 }

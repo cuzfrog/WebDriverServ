@@ -155,8 +155,8 @@ private[webdriver] class ServerApi extends Api {
   override def getText(element: Element): String = element.getText
   override def getInnerHtml(element: Element, parseLogic: String): Any = {
     val parser = RuntimeCompiler.compileLogic(parseLogic)
-    //parser.apply(element.getAttribute("innerHTML"))
-    parser.apply("some html")
+    parser.apply(element.getAttribute("innerHTML"))
+    //parser.apply("<some html>this is contents sdfsdfgsfdg</some html>")
   }
 
   override def closeWindow(window: Window): Unit = window.driver.close()
