@@ -109,16 +109,17 @@ On which a mutable Map is used as the repository to cache WebDriver instances.
 
 #####About closure serialization and sending:
 Failed experiments:
-1. Trying to serialize closure itself, remote does not have class definition.
-2. Use macro to extract source/AST of function, send source to remote and compile at runtime.
+1. Trying to serialize closure itself. Remote needs class definition.
+2. Deploy remote actor that encapsulates implementation. Remote needs actor definition.
+3. Use macro to extract source/AST of function, send source to remote and compile at runtime.
 Macro cannot resolve reference to source automatically.
 
 __Ended up with solution:__
 Define function as .scala source file in resource directory(or wherever reachable). Read it as pure source, and send
-it to the remote server, then compiled.
+it to the remote server, then compiled.(REPL/scala script)
 
-benefits:
-* Supported by IDE.
+pros:
+* Syntax check supported by IDE.
 * No requirement of complete class definition, code snippet is valid.
 * Support imports.(caveat: imports must be in the scope of the server.)
 

@@ -21,7 +21,7 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
     mainClass in Test in reStart := Some("com.github.cuzfrog.webdriver.Server")
   )
 
-lazy val client = (project in file("./client")).dependsOn(shared,macros)
+lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(Settings.commonSettings)
   .settings(
     name := "webdriver-client",
@@ -36,17 +36,7 @@ lazy val shared = (project in file("./shared"))
   .settings(
     name := "webdriver-shared",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.4.16" % "provided",
-      "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0" % "provided"
-    )
-  ).disablePlugins(RevolverPlugin)
-
-lazy val macros = (project in file("./macros"))
-  .settings(Settings.commonSettings)
-  .settings(
-    name := "webdriver-macros",
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+      "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % "test"
     )
   ).disablePlugins(RevolverPlugin)
 

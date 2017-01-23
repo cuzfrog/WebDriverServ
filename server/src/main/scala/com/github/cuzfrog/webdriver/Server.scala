@@ -8,12 +8,13 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 private[webdriver] object Server extends App with LazyLogging {
+
   System.setProperty("webdriver.chrome.driver", ServConfig.chromeDriverPath)
   System.setProperty("webdriver.ie.driver", ServConfig.IEDriverPath)
 
   private lazy val system = ActorSystem("WebDriverServ")
   private lazy val handler = system.actorOf(Props[Handler], name = "handler")
-  handler ! s"Server Initiation: Remoting now listens on addresses: [akka://${system.name}@${ServConfig.host}:${ServConfig.port}]"
+  handler ! s"Server Initiation: Remoting now listens on addresses: [akka://${system.name }@${ServConfig.host }:${ServConfig.port }]"
 
   private[webdriver] lazy val api = new ServerApi with ServerApiLogAfter
 

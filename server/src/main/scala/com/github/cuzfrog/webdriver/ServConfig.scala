@@ -5,11 +5,12 @@ import com.typesafe.config.ConfigFactory
 /**
   * Created by cuz on 1/12/17.
   */
-object ServConfig {
+private object ServConfig {
   private val config = ConfigFactory.load()
+  val host: String = config.getString("akka.remote.artery.canonical.hostname")
+  val port: Int = config.getInt("akka.remote.artery.canonical.port")
 
-  val chromeDriverPath: String = config.getString("webdriver.chrome.driver")
-  val IEDriverPath: String = config.getString("webdriver.ie.driver")
-  val host: String = config.getString("akka.remote.netty.tcp.hostname")
-  val port: Int = config.getInt("akka.remote.netty.tcp.port")
+  private val wdrCfg = config.getConfig("webdriver")
+  val chromeDriverPath: String = wdrCfg.getString("chrome.driver")
+  val IEDriverPath: String = wdrCfg.getString("ie.driver")
 }
