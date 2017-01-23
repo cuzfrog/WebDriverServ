@@ -13,18 +13,13 @@ Current under development.
 ###Feature:
 
 1. This project is written in Scala and includes two parts:
-
    * A server that runs a Selenium WebDriver and accepts client instruction.
-
    * A client which controls the server and is put in your code as dependency.
-
-2. Based on akka remoting. So client and driver can run on different "machine".
-
+2. Based on akka remoting(Artery). 
 3. Add some convenient methods. (like auto switch to window or frame.)
-
-4. Use typesafe Config. You can easily setup test environment.
-
+4. Use typesafe Config.
 5. Fine-tuned server logging and complete client document.
+6. Define html parsing logic at client side, and execute at server side.
 
 ###How to Use:
 
@@ -32,16 +27,16 @@ Current under development.
 
 Right now, you need to build for yourself:
 
-1. `git clone`
+1. `git clone `
 
 2. Go to [Selenium](http://www.seleniumhq.org/docs/03_webdriver.jsp#selenium-webdriver-s-drivers)
 download associated driver(you can find some of them in Selenium's wiki page.).
 
-3. goto server/application.conf  find and change:
+3. edit `server/src/test/resources/application.conf`:
 
     ```
-    hostname = "your server ip"
-    port = 60001
+    canonical.hostname = "your server ip or address"
+    canonical.port = 60001 #or other number
     ```
     ```
     webdriver {
@@ -50,7 +45,7 @@ download associated driver(you can find some of them in Selenium's wiki page.).
     }
     ```
 
-4. enter sbt , `change` (or `re-start`, this command will trigger sbt-revolver to start the server)
+4. enter sbt , `test:run` or `run -Dconfig.file=your-config-file-path`(ignore settings in step 3)
 
 #####Client code:
 
@@ -64,7 +59,6 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 (Try to retrieve stub of the driver on server. If failed create a new one.
 Then navigate to www.bing.com and search "Juno mission")
     ```scala
-
     object WebDriverClientTest extends App {
       val driverName = "test1"
       try {
@@ -85,6 +79,33 @@ Then navigate to www.bing.com and search "Juno mission")
       }
       //WebDriverClient.shutdownServer(host) //when necessary
     }
+    ```
+#####sending html parsing implementation to the server:
+1. Define a String parsing function as script in .scala file under resources directory. e.g.
+    ```
+    //import whatever.package //need to define server side dependencies(Setp 2)
+    
+    val ExtractorR ="""<[\d\w\s]+>(.*)<[\d\w\s/]+>""".r
+    (s: String) =>
+      s match {
+        case ExtractorR(contents) => contents
+        case "1" => "one"
+        case other => other + "(other)"
+      }
+    ```
+in file `resources/parser/source/MyFunction.scala`
+
+2. (Optional) add server side dependencies(two ways):
+   * Modify `build.sbt` directly.(Not recommended.)
+   * Provide a file named `server-extra-dependencies` under resources directory,
+   and put in multi-lines dependency definitions as:`"net.ruippeixotog" %% "scala-scraper" % "1.2.0"`
+        * Scala version will be parsed.
+        * Dependency scope corresponds to resources scope, which means definitions in `test/resources` has `test` scope.
+
+3. Use in client code:
+    ```scala
+    val element:ClientElement = ???
+    element.getInnerHtml("MyFunction") //will return parsed html.
     ```
 
 #####How to shutdown server:
