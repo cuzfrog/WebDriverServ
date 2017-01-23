@@ -7,19 +7,20 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-private[webdriver] object Server extends App with LazyLogging {
+private[webdriver] object Server extends LazyLogging {
 
-  System.setProperty("webdriver.chrome.driver", ServConfig.chromeDriverPath)
-  System.setProperty("webdriver.ie.driver", ServConfig.IEDriverPath)
+    System.setProperty("webdriver.chrome.driver", ServConfig.chromeDriverPath)
+    System.setProperty("webdriver.ie.driver", ServConfig.IEDriverPath)
 
-  private lazy val system = ActorSystem("WebDriverServ")
-  private lazy val handler = system.actorOf(Props[Handler], name = "handler")
-  handler ! s"Server Initiation: Remoting now listens on addresses: [akka://${system.name }@${ServConfig.host }:${ServConfig.port }]"
+    private lazy val system =
+    ActorSystem("WebDriverServ")
+    private lazy val handler =
+    system.actorOf(Props[Handler], name = "handler")
+    handler ! s"Server Initiation: Remoting now listens on addresses: [akka://${system.name }@${ServConfig.host }:${ServConfig.port }]"
 
-  private[webdriver] lazy val api = new ServerApi with ServerApiLogAfter
+    private[webdriver] lazy val api = new ServerApi with ServerApiLogAfter
 
-  import system.dispatcher
-
+    import system.dispatcher
   /**
     * Note: this method should not be called directly from Server, because
     * it only terminates actor system and does not close web drivers.

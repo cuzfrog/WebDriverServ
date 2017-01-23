@@ -3,7 +3,6 @@ resolvers ++= Seq(
   "spray repo" at "http://repo.spray.io"
 )
 licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
-disablePlugins(RevolverPlugin)
 shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
 onLoad in Global := (onLoad in Global).value andThen (Command.process("project server", _))
 
@@ -16,9 +15,7 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
       "com.typesafe.akka" %% "akka-slf4j" % "2.4.16",
       "org.scala-lang" % "scala-compiler" % "2.11.8",
       "ch.qos.logback" % "logback-classic" % "1.1.7"
-    ) ++ Settings.commonDependencies,
-    reColors := Seq("magenta"),
-    mainClass in Test in reStart := Some("com.github.cuzfrog.webdriver.Server")
+    ) ++ Settings.commonDependencies
   )
 
 lazy val client = (project in file("./client")).dependsOn(shared)
@@ -29,7 +26,6 @@ lazy val client = (project in file("./client")).dependsOn(shared)
       "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided"
     ) ++ Settings.commonDependencies
   )
-  .disablePlugins(RevolverPlugin)
 
 lazy val shared = (project in file("./shared"))
   .settings(Settings.commonSettings)
@@ -38,9 +34,7 @@ lazy val shared = (project in file("./shared"))
     libraryDependencies ++= Seq(
       "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % "test"
     )
-  ).disablePlugins(RevolverPlugin)
-
-addCommandAlias("change", ";re-stop;re-start")
+  )
 
 //====================release======================:
 import ReleaseTransformations._
