@@ -6,6 +6,6 @@ package com.github.cuzfrog.webdriver
 object AppService extends App {
   Server //start server
   Thread.sleep(1000)
-  scala.io.StdIn.readLine("Server is running...Press any key to exit...." + System.lineSeparator())
+  scala.io.StdIn.readLine("--Prod--Server is running...Press any key to exit...." + System.lineSeparator())
   Server.shutDown()
 }

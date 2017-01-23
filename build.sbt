@@ -8,6 +8,7 @@ onLoad in Global := (onLoad in Global).value andThen (Command.process("project s
 
 lazy val server = (project in file("./server")).dependsOn(shared % "test->test;compile->compile")
   .settings(Settings.commonSettings)
+  .settings(Server.settings)
   .settings(
     name := "webdriver-server",
     libraryDependencies ++= Seq(
@@ -23,7 +24,8 @@ lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
     name := "webdriver-client",
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided"
+      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided",
+      "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % "test"
     ) ++ Settings.commonDependencies
   )
 
@@ -32,7 +34,6 @@ lazy val shared = (project in file("./shared"))
   .settings(
     name := "webdriver-shared",
     libraryDependencies ++= Seq(
-      "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % "test"
     )
   )
 

@@ -1,7 +1,6 @@
 package com.github.cuzfrog.webdriver
 
 import com.typesafe.config.ConfigFactory
-
 /**
   * Created by cuz on 1/12/17.
   */

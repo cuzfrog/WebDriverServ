@@ -9,7 +9,8 @@ object Settings {
       "-Xlint",
       "-unchecked",
       "-deprecation",
-      "-feature")
+      "-feature"),
+    logBuffered := false
   )
 
   val commonDependencies = Seq(
