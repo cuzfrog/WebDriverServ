@@ -15,7 +15,8 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
   import ClientConfig.{actionInterval, serverUri, timeoutSec}
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
-  private val remoteListener = system.actorSelection(s"akka://WebDriverServ@$serverUri/user/handler")
+  private val remoteListener =
+    system.actorSelection(s"akka${ClientConfig.akkaProtocol}://WebDriverServ@$serverUri/user/handler")
 
   logger.debug(s"WebDriverClient started with configs:server:$serverUri,timeout:$timeoutSec,actionInterval:$actionInterval")
 
@@ -55,7 +56,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
       Await.result(tcpResponse, timeoutSec seconds)
     }
 
-    private lazy val remoteAddress = AddressFromURIString(s"akka://WebDriverServ@$serverUri")
+    private lazy val remoteAddress = AddressFromURIString(s"akka${ClientConfig.akkaProtocol}://WebDriverServ@$serverUri")
     private[webdriver] def deployActorToServer[T <: Actor : ClassTag](name: String): ActorRef = {
       system.actorOf(Props[T].withDeploy(Deploy(scope = RemoteScope(remoteAddress))),
         name = name)
