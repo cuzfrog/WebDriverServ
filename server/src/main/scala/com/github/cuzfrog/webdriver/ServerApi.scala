@@ -2,7 +2,6 @@ package com.github.cuzfrog.webdriver
 
 import java.util.concurrent.TimeUnit
 
-import com.github.cuzfrog.webdriver.DriverTypes.DriverType
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
 import org.openqa.selenium.remote.DesiredCapabilities
@@ -50,13 +49,13 @@ private[webdriver] class ServerApi extends Api {
 
   override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
     val webDriver = typ match {
-      case DriverTypes.IE =>
+      case IE =>
         val capabilities = DesiredCapabilities.internetExplorer()
         capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true)
         new InternetExplorerDriver(capabilities)
-      case DriverTypes.Chrome => new ChromeDriver()
-      case DriverTypes.FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
-      case DriverTypes.HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
+      case Chrome => new ChromeDriver()
+      case FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
+      case HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
     webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS)
     //implicit waiting

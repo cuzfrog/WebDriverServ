@@ -10,7 +10,7 @@ private[webdriver] sealed trait Request extends Message {
   def execute(api: Api): Response
 }
 
-private[webdriver] case class NewDriver(name: String, typ: DriverTypes.DriverType, waitSec: Int) extends Request {
+private[webdriver] case class NewDriver(name: String, typ: DriverType, waitSec: Int) extends Request {
   override def execute(api: Api): Ready[Driver] = Ready[Driver](api.newDriver(name, typ, waitSec))
 }
 

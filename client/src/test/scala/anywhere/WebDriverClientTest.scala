@@ -1,6 +1,6 @@
 package anywhere
 
-import com.github.cuzfrog.webdriver.{DriverTypes, WebDriverClient}
+import com.github.cuzfrog.webdriver.{Chrome, WebDriverClient}
 
 import scala.language.implicitConversions
 
@@ -9,7 +9,7 @@ object WebDriverClientTest extends App {
   try {
     val driver = WebDriverClient.retrieveDriver(driverName) match {
       case s@Some(_) => s
-      case None => WebDriverClient.newDriver(driverName, DriverTypes.Chrome)
+      case None => WebDriverClient.newDriver(driverName, Chrome)
     }
 
     implicit def getOption[T](option: Option[T]): T = option.get
