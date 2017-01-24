@@ -4,7 +4,6 @@ import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, P
 import akka.pattern.ask
 import akka.remote.RemoteScope
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.duration.DurationInt
@@ -13,22 +12,19 @@ import scala.language.postfixOps
 import scala.reflect.ClassTag
 
 object WebDriverClient extends AddClientMethod with LazyLogging {
-  private val config = ConfigFactory.load.withFallback(ConfigFactory.load("reference.conf"))
-  private val host = config.getString("webdriver.client.server-uri")
-  private val timeoutSec = config.getInt("webdriver.client.timeout")
-  private val actionIntervalMs = config.getInt("webdriver.client.action-interval")
+  import ClientConfig.{actionInterval, serverUri, timeoutSec}
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
-  private val remoteListener = system.actorSelection(s"akka://WebDriverServ@$host/user/handler")
+  private val remoteListener = system.actorSelection(s"akka://WebDriverServ@$serverUri/user/handler")
 
-  logger.debug(s"WebDriverClient started with configs:host:$host,timeout:$timeoutSec,actionInterval:$actionIntervalMs")
+  logger.debug(s"WebDriverClient started with configs:server:$serverUri,timeout:$timeoutSec,actionInterval:$actionInterval")
 
   def shutdownClient(): Future[Terminated] = system.terminate()
 
   // implicit execution context
   private[webdriver] def control(request: Request): Option[Response] = try {
 
-    Thread.sleep(actionIntervalMs)
+    Thread.sleep(actionInterval)
     val tcpResponse = (remoteListener ? request).mapTo[Response]
     val response = Await.result(tcpResponse, timeoutSec seconds)
 
@@ -59,7 +55,7 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
       Await.result(tcpResponse, timeoutSec seconds)
     }
 
-    private lazy val remoteAddress = AddressFromURIString(s"akka://WebDriverServ@$host")
+    private lazy val remoteAddress = AddressFromURIString(s"akka://WebDriverServ@$serverUri")
     private[webdriver] def deployActorToServer[T <: Actor : ClassTag](name: String): ActorRef = {
       system.actorOf(Props[T].withDeploy(Deploy(scope = RemoteScope(remoteAddress))),
         name = name)

@@ -23,7 +23,7 @@ Current under development.
 4. Use typesafe Config.
 5. Complete client document.
 6. Define html parsing script at client side, and execute at server side.
-7. Support JavaScript by Selenium WebDriver. Better browser emulation.
+7. Supports JavaScript. Better browser emulation.
 
 ##How to Use:
 
@@ -99,7 +99,7 @@ Then navigate to www.bing.com and search "Juno mission")
         case other => other + "(other)"
       }
     ```
-in file `resources/parser/source/MyFunction.scala`
+in file `resources/scripts/MyFunction.scala` (default path which can be changed via config.)
 
 2. (Optional) add server side dependencies(two ways):
    * Modify `build.sbt` directly.(Not recommended.)
