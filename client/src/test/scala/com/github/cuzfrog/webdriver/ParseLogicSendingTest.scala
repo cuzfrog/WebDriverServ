@@ -7,7 +7,7 @@ object ParseLogicSendingTest extends App {
 
   import WebDriverClient.ExperimentalAndTest._
 
-  val src = SourceReader.readSource("Func1")
+  val src = SourceReader.readSourceFromResources("Func1")
 
   println("received reply:" + sendParseLogic(src))
 
