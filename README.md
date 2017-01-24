@@ -8,22 +8,26 @@ This is where this project comes in to hold driver instance in a standalone jvm.
 
 If you are doing something alike, go [A list of headless browsers](http://www.asad.pw/HeadlessBrowsers/), see if you have a better choice.
 
+An excellent web crawling library: [scala-scraper](https://github.com/ruippeixotog/scala-scraper)
+ by ruippeixotog.
+
 Current under development.
 
-###Feature:
+##Feature:
 
 1. This project is written in Scala and includes two parts:
    * A server that runs a Selenium WebDriver and accepts client instruction.
    * A client which controls the server and is put in your code as dependency.
 2. Based on akka remoting(Artery). 
-3. Add some convenient methods. (like auto switch to window or frame.)
+3. Add some convenient methods to Selenium WebDriver. (like auto switch to window or frame.)
 4. Use typesafe Config.
-5. Fine-tuned server logging and complete client document.
-6. Define html parsing logic at client side, and execute at server side.
+5. Complete client document.
+6. Define html parsing script at client side, and execute at server side.
+7. Support JavaScript by Selenium WebDriver. Better browser emulation.
 
-###How to Use:
+##How to Use:
 
-#####Start server:
+####Start server:
 
 Right now, you need to build for yourself:
 
@@ -47,7 +51,7 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 
 4. enter sbt , `test:run` or `run -Dconfig.file=your-config-file-path`(ignore settings in step 3)
 
-#####Client code:
+####Client code:
 
 1. sbt `publishc`  (as you have cloned the whole project, this will publish client into your local repository.)
 
@@ -80,7 +84,9 @@ Then navigate to www.bing.com and search "Juno mission")
       //WebDriverClient.shutdownServer(host) //when necessary
     }
     ```
-#####sending html parsing implementation to the server:
+    
+####Sending html parsing implementation to the server:
+
 1. Define a String parsing function as script in .scala file under resources directory. e.g.
     ```
     //import whatever.package //need to define server side dependencies(Setp 2)
@@ -108,7 +114,7 @@ in file `resources/parser/source/MyFunction.scala`
     element.getInnerHtml("MyFunction") //will return parsed html.
     ```
 
-#####How to shutdown server:
+####How to shutdown server:
 
 1. exit sbt  or  `re-stop`  will tell sbt-revolver to kill the jvm.
 (Driver process will not be killed, shutdown hook not working.)
@@ -120,7 +126,7 @@ in file `resources/parser/source/MyFunction.scala`
     _Clean server cache without quit driver:_ call client `driver.clean()`. This command remove all WebDriver instances from the cache
  associated with this `driver`.
 
-#####Mechanism:
+####Mechanism:
 
 Client and server communication is based on Akka serialization of shared messages.
 (Closure is not easy to send over the tunnel, which requires sending class definition.
@@ -128,7 +134,7 @@ Described blow.)
 Client stubs of drivers, windows and elements are actually IDs, seen by the server.
 On which a mutable Map is used as the repository to cache WebDriver instances.
 
-#####About closure serialization and sending:
+####About closure serialization and sending:
 Failed experiments:
 1. Trying to serialize closure itself. Remote needs class definition.
 2. Deploy remote actor that encapsulates implementation. Remote needs actor definition.
@@ -138,11 +144,6 @@ Macro cannot resolve reference to source automatically.
 __Ended up with solution:__
 Define function as .scala source file in resource directory(or wherever reachable). Read it as pure source, and send
 it to the remote server, then compiled.(REPL/scala script)
-
-pros:
-* Syntax check supported by IDE.
-* No requirement of complete class definition, code snippet is valid.
-* Support imports.(caveat: imports must be in the scope of the server.)
 
 
 

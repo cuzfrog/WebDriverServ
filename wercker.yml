@@ -21,11 +21,6 @@ build:
     # http://devcenter.wercker.com/docs/steps/index.html
   steps:
     - script:
-        name: set credentials
-        code: |
-          sed -i "s/BINTRAY_USER/$BINTRAY_USER/g" build.sbt
-          sed -i "s/BINTRAY_PASS/$BINTRAY_PASS/g" build.sbt
-    - script:
         name: restore cache
         code: |      
           if test -d "$WERCKER_CACHE_DIR/.ivy2"; then rsync -avz "$WERCKER_CACHE_DIR/.ivy2" "$HOME/"; fi
@@ -34,10 +29,13 @@ build:
         code: |
           sbt compile
     - script:
-        name: deploy
-        code: |
-          echo publish
-    - script:
         name: store cache
         code: |      
           if test -d "$HOME/.ivy2"; then rsync -avz  "$HOME/.ivy2" "$WERCKER_CACHE_DIR"; fi
+
+publish:
+  steps:
+    - script:
+        name: publish
+        code: |
+          echo publish

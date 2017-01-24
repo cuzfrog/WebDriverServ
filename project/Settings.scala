@@ -19,4 +19,8 @@ object Settings {
     "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.0",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
   )
+
+  val publishSettings = Seq(
+    publishTo := Some("My Bintray" at s"https://api.bintray.com/maven/cuzfrog/maven/${(name in ThisProject).value }/;publish=1")
+  )
 }
