@@ -70,7 +70,7 @@ private[webdriver] class ServerApi extends Api {
 
   override def findElement(webBody: WebBody, attr: String, value: String): Element = {
     helperFindElements(webBody, attr, value) match {
-      case Nil => throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:attr:$attr ,value:$value")
+      case Nil => throw new NoSuchElementException(s"[${webBody.driver.name }]Cannot find element with:attr:$attr ,value:$value")
       case seq => seq.head
     }
   }
@@ -79,13 +79,13 @@ private[webdriver] class ServerApi extends Api {
     helperFindElements(webBody, attr, value)
   }
   override def findElementEx(webBody: WebBody, attrPairs: List[(String, String)]): Element = {
-    require(attrPairs.nonEmpty, s"[${webBody.driver.name}]find element failed, because there is no attr pairs set.")
+    require(attrPairs.nonEmpty, s"[${webBody.driver.name }]find element failed, because there is no attr pairs set.")
     val (firstAttr, firstValue) = attrPairs.head
     val elementsFromDriver = helperFindElements(webBody, firstAttr, firstValue)
     val pairs = attrPairs.map { e => (e._1, e._2) }
     def recursivelyFilter(atPr: List[(String, String)], elesToFilter: Seq[Element]): Element = {
       if (elesToFilter.isEmpty)
-        throw new NoSuchElementException(s"[${webBody.driver.name}]Cannot find element with:$pairs")
+        throw new NoSuchElementException(s"[${webBody.driver.name }]Cannot find element with:$pairs")
       if (atPr.isEmpty) elesToFilter.head
       else {
         val (at, v) = atPr.head
@@ -155,10 +155,11 @@ private[webdriver] class ServerApi extends Api {
 
   override def getText(element: Element): String = element.getText
 
-  override def getInnerHtml(element: Element, parseScript: String): Any = {
+  override def getInnerHtml(element: Element, parseScript: String): Any = if (parseScript.nonEmpty) {
     val parser = RuntimeCompiler.compileLogic(parseScript)
     parser.apply(element.getAttribute("innerHTML"))
-    //parser.apply("<some html>this is contents sdfsdfgsfdg</some html>")
+  } else {
+    element.getAttribute("innerHTML")
   }
 
   override def closeWindow(window: Window): Unit = window.driver.close()
