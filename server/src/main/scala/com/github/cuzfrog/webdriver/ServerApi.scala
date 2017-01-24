@@ -152,9 +152,11 @@ private[webdriver] class ServerApi extends Api {
     cleanCache(dc.elements)
   }
   override def getAttr(element: Element, attr: String): String = element.getAttribute(attr)
+
   override def getText(element: Element): String = element.getText
-  override def getInnerHtml(element: Element, parseLogic: String): Any = {
-    val parser = RuntimeCompiler.compileLogic(parseLogic)
+
+  override def getInnerHtml(element: Element, parseScript: String): Any = {
+    val parser = RuntimeCompiler.compileLogic(parseScript)
     parser.apply(element.getAttribute("innerHTML"))
     //parser.apply("<some html>this is contents sdfsdfgsfdg</some html>")
   }

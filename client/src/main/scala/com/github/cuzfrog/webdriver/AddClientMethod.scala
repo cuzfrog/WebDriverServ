@@ -175,14 +175,14 @@ case class ClientElement(element: Element) extends WebBodyMethod with LazyLoggin
     * You should define function script in .scala file under resource directory.
     * Note:parser function is limited to `Function[String,_]`
     *
-    * @param parser the name or full resource path of the parser source file. e.g.<br>
-    *               "Myfunction" is equivalent to "/parser/source/MyFunction.scala"<br>
-    *               If not specified, html will be sent back as original.
+    * @param parserNameOrPath the name or full resource path of the parser source file. e.g.<br>
+    *                         "Myfunction" is equivalent to "/scripts/MyFunction.scala"(path configurable)<br>
+    *                         If not specified, html will be sent back as original.
     * @return parsed html, could be any that can be serialized to send back.
     */
-  def getInnerHtml(parser: String = ""): Option[Any] = {
-    SourceReader.readSource(parser)
-    control(GetInnerHtml(element, parser)) collect { case r: Ready[Any]@unchecked => r.data }
+  def getInnerHtml(parserNameOrPath: String = ""): Option[Any] = {
+    val parserSrc = SourceReader.readSourceFromResources(parserNameOrPath)
+    control(GetInnerHtml(element, parserSrc)) collect { case r: Ready[Any]@unchecked => r.data }
   }
 }
 
