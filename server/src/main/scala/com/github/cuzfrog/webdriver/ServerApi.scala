@@ -52,10 +52,15 @@ private[webdriver] class ServerApi extends Api {
       case IE =>
         val capabilities = DesiredCapabilities.internetExplorer()
         capabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true)
+        System.clearProperty("webdriver.ie.driver")
+        System.setProperty("webdriver.ie.driver", ServConfig.IEDriverPath)
         new InternetExplorerDriver(capabilities)
-      case Chrome => new ChromeDriver()
+      case Chrome =>
+        System.clearProperty("webdriver.chrome.driver")
+        System.setProperty("webdriver.chrome.driver", ServConfig.chromeDriverPath)
+        new ChromeDriver()
       case FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
-      case HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
+      case DriverType => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
     webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS)
     //implicit waiting

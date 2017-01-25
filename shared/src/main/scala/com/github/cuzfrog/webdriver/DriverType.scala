@@ -9,5 +9,5 @@ sealed trait DriverType
 case object IE extends DriverType
 case object FireFox extends DriverType
 case object Chrome extends DriverType
-case object HtmlUnit extends DriverType
+case object DriverType extends DriverType
 

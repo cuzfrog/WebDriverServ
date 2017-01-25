@@ -1,3 +1,7 @@
+/**
+  * This is a test script.
+  */
+
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.dsl.DSL._
 val text =

@@ -18,5 +18,6 @@
     <logger name="akka.remote" level="WARN" additivity="true"/>
     <logger name="akka.event.slf4j.Slf4jLogger" level="WARN" additivity="true"/>
     <logger name="acom.github.cuzfrog.webdriver" level="TRACE" additivity="true"/>
-
+    <logger name="acom.github.cuzfrog.webdriver.ServerApiLogBefore" level="WARN" additivity="true"/>
+    <logger name="acom.github.cuzfrog.webdriver.ServerApiLogAfter" level="TRACE" additivity="true"/>
 </configuration>

@@ -16,4 +16,5 @@ private object ServConfig {
   private val wdrCfg = config.getConfig("webdriver")
   val chromeDriverPath: String = wdrCfg.getString("chrome.driver")
   val IEDriverPath: String = wdrCfg.getString("ie.driver")
+  val printExceptionStackTraceEnabled:Boolean = wdrCfg.getBoolean("server.print-excpetion-stacktrace-enabled")
 }

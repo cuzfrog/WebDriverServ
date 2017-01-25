@@ -73,5 +73,9 @@ object WebDriverClient extends AddClientMethod with LazyLogging {
     private[webdriver] def sendParseLogic(funcSrcCode: String): Option[String] = {
       control(GetInnerHtml(null, funcSrcCode)) collect { case r: Ready[String]@unchecked => r.data }
     }
+
+    private[webdriver] def sendToServer[T](msg:T)={
+      remoteListener ! msg
+    }
   }
 }
