@@ -14,7 +14,6 @@ object Settings {
   )
 
   val commonDependencies = Seq(
-    "com.google.code.findbugs" % "jsr305" % "1.3.+" % Compile,
     "com.typesafe.akka" %% "akka-actor" % "2.4.16",
     "com.typesafe.akka" %% "akka-remote" % "2.4.16",
     "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.0",

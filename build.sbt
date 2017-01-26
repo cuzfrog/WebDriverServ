@@ -22,7 +22,7 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
   )
 
 lazy val client = (project in file("./client")).dependsOn(shared)
-  .settings(commonSettings, publishSettings)
+  .settings(commonSettings, publishSettings, Client.readmeVersionSettings)
   .settings(
     name := "webdriver-client",
     libraryDependencies ++= Seq(

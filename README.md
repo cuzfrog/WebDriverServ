@@ -56,7 +56,7 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 
 2. add client dependency to your project:
 
-        "com.github.cuzfrog" %% "webdriver-client" % "some version"
+        libraryDependencies += "com.github.cuzfrog" %% "webdriver-client" % "0.2.5beta"
 
 3. code example:
 (Try to retrieve stub of the driver on server. If failed create a new one.
@@ -90,13 +90,7 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
     }
     ```
     
-    WordCountForJupiter.scala: (A script that is sent to be executed on server. See below.)
-    ```scala
-    (html: String) => {
-      val Jupiter ="""\bjupiter\b""".r
-      Jupiter.findAllIn(html.toLowerCase).toSeq.length
-    }
-    ```
+    `WordCountForJupiter`.scala: (A script that is sent to be executed on server. See below.)
     
 ###Sending html parsing implementation to the server:
 
