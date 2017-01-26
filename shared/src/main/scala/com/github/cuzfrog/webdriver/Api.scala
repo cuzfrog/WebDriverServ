@@ -5,8 +5,8 @@ package com.github.cuzfrog.webdriver
   */
 private[webdriver] trait Api {
   //client:
-  def newDriver(name: String, typ: DriverType, waitSec: Int = 10): Driver
-  def retrieveDriver(name: String): Option[Driver]
+  def retrieveDriver(name:String):Option[Driver]
+  def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int): Driver
   def shutdown(): Unit
 
   //element and window:

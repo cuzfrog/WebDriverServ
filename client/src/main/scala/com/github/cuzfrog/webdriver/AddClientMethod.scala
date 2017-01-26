@@ -7,18 +7,21 @@ import org.apache.logging.log4j.scala.Logging
 
 private[webdriver] trait AddClientMethod extends Logging {
   /**
-    * Create a driver instance on the server and return a stub for manipulation.
+    * Try to retrieve the stub of the driver instance from the server. If failed, create
+    * a new one with provided signature and return it.
     *
-    * @param name    to give the driver a name, so that it can be easily remembered or retrieved next run time.
-    * @param typ     driver's type. See Selenium WebDriver's document. { @see DriverTypes.DriverType}
-    * @param waitSec seconds to wait implicitly.
+    * @param name    the name of the driver.
+    * @param typ     driver's type.(See Selenium doc).
+    *                If retrieval succeeded, this is ignored.
+    * @param waitSec seconds to wait implicitly.(See Selenium doc).
+    *                If retrieval succeeded, this is ignored.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def newDriver(name: String, typ: DriverType, waitSec: Int = 15): Option[ClientDriver] =
-    control(NewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
+  def retrieveOrNewDriver(name: String, typ: DriverType = Chrome, waitSec: Int = 10): Option[ClientDriver] =
+    control(RetrieveOrNewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
+
   /**
-    * Retrieve the stub of the driver instance from the server.
-    *
+    * Try to retrieve the stub of the driver instance from the server.
     * @param name the name of the driver.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */

@@ -43,7 +43,7 @@ private class ServerApi extends Api {
     case "partiallink" | "partiallinktext" => By.partialLinkText(value)
   }
 
-  override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
+  protected def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
     val webDriver = typ match {
       case IE =>
         val capabilities = DesiredCapabilities.internetExplorer()
@@ -56,7 +56,7 @@ private class ServerApi extends Api {
         System.setProperty("webdriver.chrome.driver", ServConfig.chromeDriverPath)
         new ChromeDriver()
       case FireFox => throw new UnsupportedOperationException("Problematic, not implemented yet.") //new FirefoxDriver()
-      case DriverType => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
+      case HtmlUnit => throw new UnsupportedOperationException("Problematic,  not implemented yet.") //new HtmlUnitDriver()
     }
     webDriver.manage().timeouts().implicitlyWait(waitSec, TimeUnit.SECONDS)
     //implicit waiting
@@ -65,6 +65,9 @@ private class ServerApi extends Api {
     driverNameIndex.put(name, driver)
     driver
   }
+
+  override def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int): Driver =
+    driverNameIndex.getOrElseUpdate(name, newDriver(name, driverType, waitSec))
 
   override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
 
@@ -195,7 +198,7 @@ private class ServerApi extends Api {
     window
   }
 
-  override def shutdown(): Unit =if(runningStatus.get) {
+  override def shutdown(): Unit = if (runningStatus.get) {
     driverNameIndex.values.foreach(_.quit())
     repository.clear()
     Server.terminateActorSystem()

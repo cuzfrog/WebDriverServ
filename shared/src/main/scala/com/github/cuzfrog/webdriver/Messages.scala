@@ -10,14 +10,17 @@ private[webdriver] sealed trait Request extends Message {
   def execute(api: Api): Response
 }
 
-private[webdriver] case class NewDriver(name: String, typ: DriverType, waitSec: Int) extends Request {
-  override def execute(api: Api): Ready[Driver] = Ready[Driver](api.newDriver(name, typ, waitSec))
+private[webdriver] case class RetrieveDriver(name: String) extends Request {
+  override def execute(api: Api): Response = {
+    api.retrieveDriver(name).map(Ready[Driver])
+      .getOrElse(throw new NoSuchElementException(s"No driver[$name] on server."))
+  }
 }
 
-private[webdriver] case class RetrieveDriver(name: String) extends Request {
-  override def execute(api: Api): Response = api.retrieveDriver(name) match {
-    case Some(d) => Ready[Driver](d)
-    case None => Failed(s"No such driver[$name] on server.", this)
+private[webdriver] case class RetrieveOrNewDriver(name: String, typ: DriverType, waitSec: Int) extends Request {
+  override def execute(api: Api): Response = {
+    val dr = api.retrieveOrNewDriver(name, typ, waitSec)
+    Ready[Driver](dr)
   }
 }
 
@@ -120,8 +123,8 @@ private[webdriver] case object Shutdown extends Request {
   }
 }
 
-private[webdriver] case class GetInnerHtml(element: Element,parseLogic: String) extends Request{
-  override def execute(api: Api): Response = Ready(api.getInnerHtml(element,parseLogic))
+private[webdriver] case class GetInnerHtml(element: Element, parseLogic: String) extends Request {
+  override def execute(api: Api): Response = Ready(api.getInnerHtml(element, parseLogic))
 }
 
 private[webdriver] sealed trait Response extends Message

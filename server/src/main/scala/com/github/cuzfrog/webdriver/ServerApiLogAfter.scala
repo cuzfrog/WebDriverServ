@@ -6,7 +6,7 @@ import org.apache.logging.log4j.scala.Logging
 /**
   * Created by Cause Frog on 7/26/2016.
   */
-private[webdriver] trait ServerApiLogAfter extends Api with Logging {
+private[webdriver] trait ServerApiLogAfter extends ServerApi with Logging {
 
   import System.lineSeparator
 
@@ -16,15 +16,21 @@ private[webdriver] trait ServerApiLogAfter extends Api with Logging {
     windows
   }
   abstract override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
-    val driver = super.newDriver(name, typ)
-    logger.trace(s"[${driver.name }]create new driver[$typ]")
+    val driver = super.newDriver(name, typ, waitSec)
+    logger.trace(s"[${driver.name }]created new driver[$typ]")
     driver
+  }
+  abstract override def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int): Driver = {
+    val result = super.retrieveOrNewDriver(name, driverType, waitSec)
+    logger.trace(s"[$name]retrieved or created driver:$result")
+    result
   }
   abstract override def retrieveDriver(name: String): Option[Driver] = {
     val result = super.retrieveDriver(name)
-    logger.trace(s"[$name]try to retrieve driver, result:$result")
+    logger.trace(s"[$name]Driver retrieved with result:$result")
     result
   }
+
   abstract override def findElement(webBody: WebBody, attr: String, value: String): Element = {
     val ele = super.findElement(webBody, attr, value)
     logger.trace(s"[${webBody.driver.name }]find element:${ele._id } by[attr=$attr,value=$value]")

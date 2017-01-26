@@ -1,13 +1,13 @@
 package com.github.cuzfrog.webdriver
 
-import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, Props, Terminated}
+import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, Props}
 import akka.pattern.ask
 import akka.remote.RemoteScope
 import akka.util.Timeout
 import org.apache.logging.log4j.scala.Logging
 
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future, TimeoutException}
+import scala.concurrent.{Await, TimeoutException}
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 
@@ -20,7 +20,14 @@ object WebDriverClient extends AddClientMethod with Logging {
 
   logger.debug(s"WebDriverClient started with configs:server:$serverUri,timeout:$timeoutSec,actionInterval:$actionInterval")
 
-  def shutdownClient(): Future[Terminated] = system.terminate()
+  import system.dispatcher
+
+  /**
+    * Shut down client system.
+    */
+  def shutdownClient(): Unit = system.terminate().map{t=>
+    logger.info(s"Client system terminated$t.")
+  }
 
   // implicit execution context
   private[webdriver] def control(request: Request): Option[Response] = try {
@@ -46,7 +53,7 @@ object WebDriverClient extends AddClientMethod with Logging {
 
 
   //===================test and experimental=======================
-  object ExperimentalAndTest {
+  private[webdriver] object ExperimentalAndTest {
     private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
       def implicitPrint(implicit ev: ClassTag[_]) =
         logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass}")

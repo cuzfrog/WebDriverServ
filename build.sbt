@@ -27,7 +27,7 @@ lazy val client = (project in file("./client")).dependsOn(shared)
     name := "webdriver-client",
     libraryDependencies ++= Seq(
       "org.apache.logging.log4j" % "log4j-core" % "2.7" % "provided",
-      "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % "test"
+      "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % Test
     ) ++ commonDependencies
   )
 

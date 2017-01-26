@@ -7,8 +7,7 @@ When developing or debugging with WebDriver, we sometimes want to stay to the ve
 This is where this project comes in to hold driver instance in a standalone jvm.
 
 If you are doing something alike, go [A list of headless browsers](http://www.asad.pw/HeadlessBrowsers/), see if you have a better choice.
-
-An excellent web crawling library: [scala-scraper](https://github.com/ruippeixotog/scala-scraper)
+And an excellent web crawling library: [scala-scraper](https://github.com/ruippeixotog/scala-scraper)
  by ruippeixotog.
 
 Current under development.
@@ -44,8 +43,8 @@ download associated driver(you can find some of them in Selenium's wiki page.).
     ```
     ```
     webdriver {
-      chrome.driver = "driver exe path"
-      ie.driver = "driver exe path"
+      chrome.driver = "driver executable path"
+      ie.driver = "driver executable path"
     }
     ```
 
@@ -61,34 +60,47 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 
 3. code example:
 (Try to retrieve stub of the driver on server. If failed create a new one.
-Then navigate to www.bing.com and search "Juno mission")
+Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter")
     ```scala
+    import com.github.cuzfrog.webdriver.{Chrome, WebDriverClient}
+    import scala.language.implicitConversions
+    
     object WebDriverClientTest extends App {
       val driverName = "test1"
+      implicit def getOption[T](option: Option[T]): T = option.get
+      
       try {
-        val driver = WebDriverClient.retrieveDriver(driverName) match {
-          case s@Some(_) => s
-          case None => WebDriverClient.newDriver(driverName, DriverTypes.Chrome)
-        }
-
-        implicit def getOption[T](option: Option[T]): T = option.get
+        val driver = WebDriverClient.retrieveOrNewDriver(driverName, Chrome)
         val window = driver.navigateTo("http://www.bing.com")
         window.findElement("id", "sb_form_q").sendKeys("Juno mission")
         window.findElement("id", "sb_form").submit()
         window.executeJS("console.log('testJS')")
-
-        scala.io.StdIn.readLine("press any to shut down the client.....")
+        val jupiterCnt =
+          window.findElement("id", "b_content").getInnerHtml("WordCountForJupiter").asInstanceOf[Option[Int]]
+    
+        println(s"There are $jupiterCnt 'jupiter' in the page content area.")
+        Thread.sleep(3000)
+        driver.kill() //when necessary
       } finally {
+        WebDriverClient.shutdownServer() //when necessary
+        Thread.sleep(500)
         WebDriverClient.shutdownClient()
       }
-      //WebDriverClient.shutdownServer(host) //when necessary
+    }
+    ```
+    
+    WordCountForJupiter.scala: (Aa script that is sent to be executed on server. See below.)
+    ```scala
+    (html: String) => {
+      val Jupiter ="""\bjupiter\b""".r
+      Jupiter.findAllIn(html.toLowerCase).toSeq.length
     }
     ```
     
 ####Sending html parsing implementation to the server:
 
 1. Define a String parsing function as script in .scala file under resources directory. e.g.
-    ```
+    ```scala
     //import whatever.package //need to define server side dependencies(Setp 2)
     
     val ExtractorR ="""<[\d\w\s]+>(.*)<[\d\w\s/]+>""".r

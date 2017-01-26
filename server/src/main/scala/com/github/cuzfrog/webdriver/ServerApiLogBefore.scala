@@ -4,7 +4,7 @@ import org.apache.logging.log4j.scala.Logging
 /**
   * Created by cuz on 1/25/17.
   */
-private trait ServerApiLogBefore extends Api with Logging {
+private trait ServerApiLogBefore extends ServerApi with Logging {
   abstract override def newDriver(name: String, typ: DriverType, waitSec: Int): Driver = {
     val driverPath = System.getProperty("webdriver.chrome.driver")
     logger.trace(s"Begin to create driver[$typ], path in property is[$driverPath] ")
