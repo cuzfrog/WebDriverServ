@@ -18,9 +18,15 @@ object Server {
           IO.readLines(f).filter(_.nonEmpty).map(dep => parseDependency(dep, defSeq._1))
         }
       }
-      extDeps.foreach(ed => println(s"[info]Extra dependency added:$ed"))
+      extDeps.foreach(ed => println(s"[info] Extra dependency added:$ed"))
       extDeps
-    }
+    },
+    resourceGenerators in Compile += Def.task {
+      val file = resourceManaged.value / "build-info.properties"
+      val contents = "name=%s\nversion=%s".format(name.value, version.value)
+      IO.write(file, contents)
+      Seq(file)
+    }.taskValue
   )
 
   private lazy val DepExtractor ="""^"(.+)"\s+(%+)\s+"(.+)"\s+%\s+"(.+)"(\s+%\s+".+")?$""".r

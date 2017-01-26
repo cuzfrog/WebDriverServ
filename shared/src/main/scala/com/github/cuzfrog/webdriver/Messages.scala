@@ -116,7 +116,7 @@ private[webdriver] case class CloseWindow(window: Window) extends Request {
 private[webdriver] case object Shutdown extends Request {
   override def execute(api: Api): Success = {
     api.shutdown()
-    Success("Server shutdown.")
+    Success("Tell server to shutdown.")
   }
 }
 

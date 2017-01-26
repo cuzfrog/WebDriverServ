@@ -1,5 +1,6 @@
 package com.github.cuzfrog.webdriver
 
+import java.util.NoSuchElementException
 import java.util.concurrent.TimeUnit
 
 import org.openqa.selenium.chrome.ChromeDriver
@@ -14,14 +15,9 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Not thread safe, should be accessed within actor. Exceptions are handled in actor.
   */
-private[webdriver] class ServerApi extends Api {
+private class ServerApi extends Api {
 
-  import scala.collection.concurrent.TrieMap
-
-  private val repository = TrieMap.empty[Long, Container]
-  private val driverNameIndex = TrieMap.empty[String, Driver]
-  private val idGen = new java.util.concurrent.atomic.AtomicLong
-  private def newId: Long = idGen.getAndIncrement()
+  import ServerStatus._
 
   import scala.language.implicitConversions
 
@@ -128,7 +124,7 @@ private[webdriver] class ServerApi extends Api {
     new WebDriverWait(webBody.driver, 0).until(ExpectedConditions.presenceOfElementLocated(by))
     true
   } catch {
-    case e: org.openqa.selenium.TimeoutException => false
+    case _: org.openqa.selenium.TimeoutException => false
   }
   override def executeJS(webBody: WebBody, script: String): Any = {
     webBody.driver.executeScript(script)
@@ -139,7 +135,10 @@ private[webdriver] class ServerApi extends Api {
   override def submit(element: Element): Unit = element.submit()
   override def click(element: Element): Unit = element.click()
   override def kill(driver: Driver): Long = {
-    val dc = repository(driver._id).asInstanceOf[DriverContainer]
+    val dc = repository.get(driver._id) match {
+      case Some(drCont: DriverContainer) => drCont
+      case _ => throw new NoSuchElementException(s"No $driver in repository.")
+    }
     dc.seleniumDriver.quit()
     driverNameIndex.remove(driver.name)
     repository.remove(driver._id)
@@ -196,12 +195,11 @@ private[webdriver] class ServerApi extends Api {
     window
   }
 
-  override def shutdown(): Unit = {
+  override def shutdown(): Unit =if(runningStatus.get) {
+    driverNameIndex.values.foreach(_.quit())
     repository.clear()
-    driverNameIndex.foreach {
-      _._2.quit()
-    }
     Server.terminateActorSystem()
+    runningStatus.set(false)
   }
 
 }

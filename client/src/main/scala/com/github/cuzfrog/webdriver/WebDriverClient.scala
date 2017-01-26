@@ -4,14 +4,14 @@ import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, P
 import akka.pattern.ask
 import akka.remote.RemoteScope
 import akka.util.Timeout
-import com.typesafe.scalalogging.LazyLogging
+import org.apache.logging.log4j.scala.Logging
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future, TimeoutException}
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 
-object WebDriverClient extends AddClientMethod with LazyLogging {
+object WebDriverClient extends AddClientMethod with Logging {
   import ClientConfig.{actionInterval, serverUri, timeoutSec}
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)

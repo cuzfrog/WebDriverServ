@@ -17,7 +17,8 @@ object Settings {
     "com.typesafe.akka" %% "akka-actor" % "2.4.16",
     "com.typesafe.akka" %% "akka-remote" % "2.4.16",
     "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.0",
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
+    "org.apache.logging.log4j" %% "log4j-api-scala" % "2.7",
+    "org.apache.logging.log4j" % "log4j-api" % "2.7"
   )
 
   val publishSettings = Seq(

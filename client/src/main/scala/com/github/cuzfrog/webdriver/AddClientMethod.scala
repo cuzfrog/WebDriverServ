@@ -3,9 +3,9 @@ package com.github.cuzfrog.webdriver
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
 import com.github.cuzfrog.webdriver.WebDriverClient.control
-import com.typesafe.scalalogging.LazyLogging
+import org.apache.logging.log4j.scala.Logging
 
-private[webdriver] trait AddClientMethod extends LazyLogging {
+private[webdriver] trait AddClientMethod extends Logging {
   /**
     * Create a driver instance on the server and return a stub for manipulation.
     *
@@ -31,7 +31,7 @@ private[webdriver] trait AddClientMethod extends LazyLogging {
   def shutdownServer(): Unit = control(Shutdown) collect { case f: Success => logger.trace(f.msg) }
 }
 
-case class ClientDriver(driver: Driver) extends LazyLogging {
+case class ClientDriver(driver: Driver) extends Logging {
   val name: String = driver.name
 
   /**
@@ -70,7 +70,7 @@ case class ClientDriver(driver: Driver) extends LazyLogging {
     */
   def clean(): Unit = control(CleanCache(driver)) collect { case f: Success => logger.trace(f.msg) }
 }
-private[webdriver] trait WebBodyMethod extends LazyLogging {
+private[webdriver] trait WebBodyMethod extends Logging {
   protected val webBody: WebBody
   /**
     * Invoke FindElement on the server and return a stub of an element.
@@ -141,7 +141,7 @@ case class ClientWindow(window: Window) extends WebBodyMethod {
   def close(): Unit = control(CloseWindow(window)) collect { case f: Success => logger.trace(f.msg) }
 }
 
-case class ClientElement(element: Element) extends WebBodyMethod with LazyLogging {
+case class ClientElement(element: Element) extends WebBodyMethod {
   protected val webBody: WebBody = element
 
   /**

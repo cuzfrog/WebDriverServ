@@ -21,9 +21,12 @@ object WebDriverClientTest extends App {
       window.findElement("id", "b_content").getInnerHtml("WordCountForJupiter").asInstanceOf[Option[Int]]
 
     println(s"There are $jupiterCnt 'jupiter' in the page content area.")
-    scala.io.StdIn.readLine("press any to shut down the client.....")
+    Thread.sleep(3000)
+    driver.kill()
   } finally {
+    WebDriverClient.shutdownServer() //when necessary
+    Thread.sleep(500)
     WebDriverClient.shutdownClient()
   }
-  //WebDriverClient.shutdownServer(host) //when necessary
+
 }

@@ -1,13 +1,11 @@
 package com.github.cuzfrog.webdriver
 
-import akka.actor.{Actor, ActorSystem, Props, Terminated}
-import com.typesafe.scalalogging.LazyLogging
+import akka.actor.{Actor, ActorSystem, Props}
+import org.apache.logging.log4j.scala.Logging
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.language.postfixOps
 
-private[webdriver] object Server extends LazyLogging {
+private[webdriver] object Server extends Logging {
 
   private val system = ActorSystem("WebDriverServ")
   private val handler = system.actorOf(Props[Handler], name = "handler")
@@ -25,22 +23,19 @@ private[webdriver] object Server extends LazyLogging {
     */
   private[webdriver] def terminateActorSystem(): Unit = {
     logger.info("Server is shutting down...")
-    val terminated = system.terminate()
-    val f = new PartialFunction[Terminated, Unit] {
-      def apply(t: Terminated): Unit = logger.info(s"Actor system terminated: $t")
-      def isDefinedAt(t: Terminated): Boolean = t.existenceConfirmed
+    system.terminate().map { t =>
+      logger.info(s"Actor system terminated: $t")
     }
-    terminated.onSuccess(f)
-    Await.result(terminated, 15 seconds)
   }
 
   /**
     * Shut down the server. Quit all web driver, clear caches and terminate actor system.
+    * <br>Note: This method is for testing, and is only called from server side.
     */
   private[webdriver] def shutDown(): Unit = api.shutdown()
 }
 
-private[webdriver] class Handler extends Actor with LazyLogging {
+private[webdriver] class Handler extends Actor with Logging {
   def receive: Receive = {
     case r: Request =>
       logger.trace(s"Receive request: $r")

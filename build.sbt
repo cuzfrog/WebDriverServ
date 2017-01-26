@@ -15,10 +15,10 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
     name := "webdriver-server",
     libraryDependencies ++= Seq(
       "org.seleniumhq.selenium" % "selenium-java" % "2.53.1",
-      "com.typesafe.akka" %% "akka-slf4j" % "2.4.16",
+      "de.heikoseeberger" %% "akka-log4j" % "1.2.2",
       "org.scala-lang" % "scala-compiler" % "2.11.8",
-      "ch.qos.logback" % "logback-classic" % "1.1.7"
-    ) ++ Settings.commonDependencies
+      "org.apache.logging.log4j" % "log4j-core" % "2.7"
+    ) ++ commonDependencies
   )
 
 lazy val client = (project in file("./client")).dependsOn(shared)
@@ -26,9 +26,9 @@ lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(
     name := "webdriver-client",
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.1.7" % "provided",
+      "org.apache.logging.log4j" % "log4j-core" % "2.7" % "provided",
       "net.ruippeixotog" %% "scala-scraper" % "1.2.0" % "test"
-    ) ++ Settings.commonDependencies
+    ) ++ commonDependencies
   )
 
 lazy val shared = (project in file("./shared"))
@@ -50,5 +50,5 @@ releaseProcess := Seq[ReleaseStep](
 )
 releaseNextVersion := { ver => Version(ver).map(_.bumpBugfix.string).getOrElse(versionFormatError) }
 addCommandAlias("bumpVer", "release with-defaults")
-addCommandAlias("publishc", ";reload;client/publish-local;shared/publish-local")
+addCommandAlias("publishc", ";reload;client/publish-local;shared/publish-local;bumpVer")
 addCommandAlias("publishBintray", ";reload;client/publish;shared/publish")
