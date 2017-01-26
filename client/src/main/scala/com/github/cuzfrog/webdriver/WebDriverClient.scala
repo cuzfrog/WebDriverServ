@@ -23,7 +23,7 @@ object WebDriverClient extends AddClientMethod with Logging {
   import system.dispatcher
 
   /**
-    * Shut down client system.
+    * Shut down client system. Actor system is shutting down in another thread.
     */
   def shutdownClient(): Unit = system.terminate().map{t=>
     logger.info(s"Client system terminated$t.")

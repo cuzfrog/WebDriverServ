@@ -7,8 +7,9 @@ import org.apache.logging.log4j.scala.Logging
 
 private[webdriver] trait AddClientMethod extends Logging {
   /**
-    * Try to retrieve the stub of the driver instance from the server. If failed, create
-    * a new one with provided signature and return it.
+    * Try to retrieve the stub of the driver instance from the server,
+    * with all elements associated with this driver cleaned in the server cache.
+    * If failed, create a new one with provided signature and return it.
     *
     * @param name    the name of the driver.
     * @param typ     driver's type.(See Selenium doc).
@@ -21,7 +22,8 @@ private[webdriver] trait AddClientMethod extends Logging {
     control(RetrieveOrNewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
 
   /**
-    * Try to retrieve the stub of the driver instance from the server.
+    * Try to retrieve the stub of the driver instance from the server,
+    * with all elements associated with this driver cleaned in the server cache.
     * @param name the name of the driver.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */

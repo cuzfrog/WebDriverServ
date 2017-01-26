@@ -66,10 +66,16 @@ private class ServerApi extends Api {
     driver
   }
 
-  override def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int): Driver =
-    driverNameIndex.getOrElseUpdate(name, newDriver(name, driverType, waitSec))
+  override def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int): Driver = {
+    this.retrieveDriver(name).getOrElse(newDriver(name, driverType, waitSec))
+  }
 
   override def retrieveDriver(name: String): Option[Driver] = driverNameIndex.get(name)
+    .map { dri =>
+      val dcOpt = repository.get(dri._id) collect { case dc: DriverContainer => dc }
+      dcOpt.foreach(dc => cleanCache(dc.elements))
+      dri
+    }
 
   override def findElement(webBody: WebBody, attr: String, value: String): Element = {
     helperFindElements(webBody, attr, value) match {

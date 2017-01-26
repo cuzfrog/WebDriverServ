@@ -71,6 +71,7 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
       
       try {
         val driver = WebDriverClient.retrieveOrNewDriver(driverName, Chrome)
+         //when retrieving, all elements associated with this driver are purged on the server cache
         val window = driver.navigateTo("http://www.bing.com")
         window.findElement("id", "sb_form_q").sendKeys("Juno mission")
         window.findElement("id", "sb_form").submit()
@@ -138,13 +139,23 @@ in file `resources/scripts/MyFunction.scala` (default path which can be changed 
     _Clean server cache without quit driver:_ call client `driver.clean()`. This command remove all WebDriver instances from the cache
  associated with this `driver`.
 
-####Mechanism:
+####Mechanism(important):
 
 Client and server communication is based on Akka serialization of shared messages.
-(Closure is not easy to send over the tunnel, which requires sending class definition.
-Described blow.)
-Client stubs of drivers, windows and elements are actually IDs, seen by the server.
-On which a mutable Map is used as the repository to cache WebDriver instances.
+
+Client stubs of drivers, windows and elements are actually IDs, seen by the server, 
+on which mutable Maps is used as the repository to cache WebDriver/element instances. 
+As time goes by, the cache may grow to a degree that clogs the GC.
+
+So you may clean caches on the server in two ways:
+1. Retrieve the driver. When retrieving, all elements associated with this driver will be purged
+in the cache. The use case is pretty intuitive.
+2. Explicitly call method:
+
+        driver.clean()
+
+In fact, Selenium doc states that elements may expire when window has refreshed. Thus 
+useless references may pile on the server. Call `clean()` explicitly when needed.
 
 ####About closure serialization and sending:
 Failed experiments:
