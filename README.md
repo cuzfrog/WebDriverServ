@@ -26,7 +26,7 @@ Current under development.
 
 ##How to Use:
 
-####Start server:
+###Start server:
 
 Right now, you need to build for yourself:
 
@@ -38,8 +38,8 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 3. edit `server/src/test/resources/application.conf`:
 
     ```
-    canonical.hostname = "your server ip or address"
-    canonical.port = 60001 #or other number
+    hostname = "your server ip or address"
+    port = 60001 #or other number
     ```
     ```
     webdriver {
@@ -50,7 +50,7 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 
 4. enter sbt , `test:run` or `run -Dconfig.file=your-config-file-path`(ignore settings in step 3)
 
-####Client code:
+###Client code:
 
 1. sbt `publishc`  (as you have cloned the whole project, this will publish client into your local repository.)
 
@@ -90,7 +90,7 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
     }
     ```
     
-    WordCountForJupiter.scala: (Aa script that is sent to be executed on server. See below.)
+    WordCountForJupiter.scala: (A script that is sent to be executed on server. See below.)
     ```scala
     (html: String) => {
       val Jupiter ="""\bjupiter\b""".r
@@ -98,21 +98,17 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
     }
     ```
     
-####Sending html parsing implementation to the server:
+###Sending html parsing implementation to the server:
 
 1. Define a String parsing function as script in .scala file under resources directory. e.g.
     ```scala
     //import whatever.package //need to define server side dependencies(Setp 2)
-    
-    val ExtractorR ="""<[\d\w\s]+>(.*)<[\d\w\s/]+>""".r
-    (s: String) =>
-      s match {
-        case ExtractorR(contents) => contents
-        case "1" => "one"
-        case other => other + "(other)"
-      }
+    (html: String) => {
+          val Jupiter ="""\bjupiter\b""".r
+          Jupiter.findAllIn(html.toLowerCase).toSeq.length
+        }
     ```
-in file `resources/scripts/MyFunction.scala` (default path which can be changed via config.)
+in file `resources/scripts/WordCountForJupiter.scala` (default path, which can be changed via config.)
 
 2. (Optional) add server side dependencies(two ways):
    * Modify `build.sbt` directly.(Not recommended.)
@@ -124,22 +120,18 @@ in file `resources/scripts/MyFunction.scala` (default path which can be changed 
 3. Use in client code:
     ```scala
     val element:ClientElement = ???
-    element.getInnerHtml("MyFunction") //will return parsed html.
+    element.getInnerHtml("WordCountForJupiter") //will return parsed result.
     ```
 
-####How to shutdown server:
+###How to shutdown server:
 
-1. exit sbt  or  `re-stop`  will tell sbt-revolver to kill the jvm.
-(Driver process will not be killed, shutdown hook not working.)
+1. Exiting sbt will kill the jvm, but not the WebDriver process.(Not recommended)
 
-2. call client `shutdownServer()` (Recommended).
+2. Call client `shutdownServer()` (Recommended).
 
     _Quit single driver:_ call client `driver.kill()` this will not shutdown the server.
 
-    _Clean server cache without quit driver:_ call client `driver.clean()`. This command remove all WebDriver instances from the cache
- associated with this `driver`.
-
-####Mechanism(important):
+###Mechanism (Important):
 
 Client and server communication is based on Akka serialization of shared messages.
 
@@ -148,6 +140,7 @@ on which mutable Maps is used as the repository to cache WebDriver/element insta
 As time goes by, the cache may grow to a degree that clogs the GC.
 
 So you may clean caches on the server in two ways:
+
 1. Retrieve the driver. When retrieving, all elements associated with this driver will be purged
 in the cache. The use case is pretty intuitive.
 2. Explicitly call method:
@@ -157,12 +150,13 @@ in the cache. The use case is pretty intuitive.
 In fact, Selenium doc states that elements may expire when window has refreshed. Thus 
 useless references may pile on the server. Call `clean()` explicitly when needed.
 
-####About closure serialization and sending:
+###About closure serialization and sending:
 Failed experiments:
+
 1. Trying to serialize closure itself. Remote needs class definition.
 2. Deploy remote actor that encapsulates implementation. Remote needs actor definition.
 3. Use macro to extract source/AST of function, send source to remote and compile at runtime.
-Macro cannot resolve reference to source automatically.
+Macro cannot resolve references automatically.
 
 __Ended up with solution:__
 Define function as .scala source file in resource directory(or wherever reachable). Read it as pure source, and send
