@@ -180,7 +180,7 @@ case class ClientElement(element: Element) extends WebBodyMethod {
     * Note:parser function is limited to `Function[String,_]`
     *
     * @param parserNameOrPath the name or full resource path of the parser source file. e.g.<br>
-    *                         "Myfunction" is equivalent to "/scripts/MyFunction.scala"(path configurable)<br>
+    *                         "Myfunction" is equivalent to "/scripts/MyFunction.sc"(path configurable)<br>
     *                         If not specified, html will be sent back as original.
     * @return parsed html, could be any that can be serialized to send back.
     */

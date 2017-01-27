@@ -90,7 +90,7 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
     }
     ```
     
-    `WordCountForJupiter`.scala: (A script that is sent to be executed on server. See below.)
+    `WordCountForJupiter`.sc: (A script that is sent to be executed on server. See below.)
     
 ###Sending html parsing implementation to the server:
 
@@ -102,7 +102,7 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
           Jupiter.findAllIn(html.toLowerCase).toSeq.length
         }
     ```
-in file `resources/scripts/WordCountForJupiter.scala` (default path, which can be changed via config.)
+in file `resources/scripts/WordCountForJupiter.sc` (default path, which can be changed via config.)
 
 2. (Optional) add server side dependencies(two ways):
    * Modify `build.sbt` directly.(Not recommended.)
