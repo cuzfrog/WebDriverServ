@@ -12,20 +12,23 @@ import scala.language.postfixOps
 import scala.reflect.ClassTag
 
 object WebDriverClient extends AddClientMethod with Logging {
+
   import ClientConfig.{actionInterval, serverUri, timeoutSec}
+
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
+  private val remoteAddr = s"akka${ClientConfig.akkaProtocol }://WebDriverServ@$serverUri"
   private val remoteListener =
-    system.actorSelection(s"akka${ClientConfig.akkaProtocol}://WebDriverServ@$serverUri/user/handler")
+    system.actorSelection(s"$remoteAddr/user/handler")
 
-  logger.debug(s"WebDriverClient started with configs:server:$serverUri,timeout:$timeoutSec,actionInterval:$actionInterval")
+  logger.debug(s"WebDriverClient started with configs:server:$remoteAddr,timeout:$timeoutSec,actionInterval:$actionInterval")
 
   import system.dispatcher
 
   /**
     * Shut down client system. Actor system is shutting down in another thread.
     */
-  def shutdownClient(): Unit = system.terminate().map{t=>
+  def shutdownClient(): Unit = system.terminate().map { t =>
     logger.info(s"Client system terminated$t.")
   }
 
@@ -38,7 +41,7 @@ object WebDriverClient extends AddClientMethod with Logging {
 
     response match {
       case Failed(msg, r) =>
-        logger.debug(s"Server: failed request:$r exception msg:${System.lineSeparator}$msg"); None
+        logger.debug(s"Server: failed request:$r exception msg:${System.lineSeparator }$msg"); None
       case _ => Some(response)
     }
 
@@ -56,14 +59,14 @@ object WebDriverClient extends AddClientMethod with Logging {
   private[webdriver] object ExperimentalAndTest {
     private[webdriver] def bounceTest[T: ClassTag](msg: T): T = {
       def implicitPrint(implicit ev: ClassTag[_]) =
-        logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass}")
+        logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass }")
       implicitPrint
       //println runtime class
       val tcpResponse = (remoteListener ? msg).mapTo[T]
       Await.result(tcpResponse, timeoutSec seconds)
     }
 
-    private lazy val remoteAddress = AddressFromURIString(s"akka${ClientConfig.akkaProtocol}://WebDriverServ@$serverUri")
+    private lazy val remoteAddress = AddressFromURIString(remoteAddr)
     private[webdriver] def deployActorToServer[T <: Actor : ClassTag](name: String): ActorRef = {
       system.actorOf(Props[T].withDeploy(Deploy(scope = RemoteScope(remoteAddress))),
         name = name)
@@ -81,7 +84,7 @@ object WebDriverClient extends AddClientMethod with Logging {
       control(GetInnerHtml(null, funcSrcCode)) collect { case r: Ready[String]@unchecked => r.data }
     }
 
-    private[webdriver] def sendToServer[T](msg:T)={
+    private[webdriver] def sendToServer[T](msg: T) = {
       remoteListener ! msg
     }
   }
