@@ -32,6 +32,14 @@ object WebDriverClient extends AddClientMethod with Logging {
     logger.info(s"Client system terminated$t.")
   }
 
+  /**
+    * Send a message to server to do a bounce test.
+    * @param msg message sent to server
+    * @tparam T type of message
+    * @return the same message sent.
+    */
+  def bounceTest[T: ClassTag](msg: T): T = ExperimentalAndTest.bounceTest(msg)
+
   // implicit execution context
   private[webdriver] def control(request: Request): Option[Response] = try {
 
@@ -53,7 +61,6 @@ object WebDriverClient extends AddClientMethod with Logging {
       logger.debug(e.getMessage)
       None
   }
-
 
   //===================test and experimental=======================
   private[webdriver] object ExperimentalAndTest {
