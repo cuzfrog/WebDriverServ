@@ -1,12 +1,9 @@
 package com.github.cuzfrog.webdriver
 
-
-
 import org.apache.logging.log4j.scala.Logging
 
 import scala.reflect.runtime.{universe => ru}
-import scala.tools.reflect.{ToolBox, ToolBoxError}
-import scala.util.{Failure, Try}
+import scala.tools.reflect.ToolBox
 
 /**
   * Created by cuz on 1/17/17.
@@ -14,7 +11,7 @@ import scala.util.{Failure, Try}
 private object RuntimeCompiler extends Logging {
   private val tb = ru.runtimeMirror(getClass.getClassLoader).mkToolBox()
   private def classDef(src: String) = {
-    logger.trace(s"Parse logic class source for compilation:${System.lineSeparator }$src")
+    logger.trace(s"Compile script.... md5[${MD5(src)}]")
     tb.parse(src)
   }
 
@@ -27,5 +24,4 @@ private object RuntimeCompiler extends Logging {
       throw ScalaReflectionException("Runtime compilation failed.")
   }
 
-  //def getType[T: ru.TypeTag](instance: T): ru.Type = ru.typeOf[T]
 }

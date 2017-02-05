@@ -111,4 +111,8 @@ private[webdriver] trait ServerApiLogAfter extends ServerApi with Logging {
     super.shutdown()
     logger.trace(s"Called Server.shutdown.")
   }
+  override def getInnerHtml(element: Element, parseScript: String): Any = {
+    val result = super.getInnerHtml(element, parseScript)
+    logger.trace(s"Parsed html sent to client. Script length:${parseScript.length } md5${MD5(parseScript) }")
+  }
 }
