@@ -18,8 +18,11 @@ object WebDriverClient extends AddClientMethod with Logging {
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
   private val remoteAddr = s"akka${ClientConfig.akkaProtocol }://WebDriverServ@$serverUri"
-  private val remoteListener =
-    system.actorSelection(s"$remoteAddr/user/handler")
+  private val remoteListener =try {
+    Await.result(system.actorSelection(s"$remoteAddr/user/handler").resolveOne(), timeout.duration)
+  } finally {
+    this.shutdownClient()
+  }
 
   logger.debug(s"WebDriverClient started with configs:server:$remoteAddr,timeout:$timeoutSec,actionInterval:$actionInterval")
 
@@ -34,6 +37,7 @@ object WebDriverClient extends AddClientMethod with Logging {
 
   /**
     * Send a message to server to do a bounce test.
+    *
     * @param msg message sent to server
     * @tparam T type of message
     * @return the same message sent.
