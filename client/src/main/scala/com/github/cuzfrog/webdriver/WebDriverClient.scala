@@ -20,8 +20,11 @@ object WebDriverClient extends AddClientMethod with Logging {
   private val remoteAddr = s"akka${ClientConfig.akkaProtocol }://WebDriverServ@$serverUri"
   private val remoteListener =try {
     Await.result(system.actorSelection(s"$remoteAddr/user/handler").resolveOne(), timeout.duration)
-  } finally {
-    this.shutdownClient()
+  } catch {
+    case e:Exception=>
+      this.shutdownClient()
+      logger.error("Fail to resolve remote actor ref")
+      throw e
   }
 
   logger.debug(s"WebDriverClient started with configs:server:$remoteAddr,timeout:$timeoutSec,actionInterval:$actionInterval")
