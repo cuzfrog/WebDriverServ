@@ -11,7 +11,7 @@ import scala.tools.reflect.ToolBox
 private object RuntimeCompiler extends Logging {
   private val tb = ru.runtimeMirror(getClass.getClassLoader).mkToolBox()
   private def classDef(src: String) = {
-    logger.trace(s"Compile script.... md5[${MD5(src)}]")
+    logger.trace(s"Compile script.... md5 [${MD5(src)}]")
     tb.parse(src)
   }
 
