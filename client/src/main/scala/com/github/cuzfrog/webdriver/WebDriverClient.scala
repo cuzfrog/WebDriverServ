@@ -56,7 +56,7 @@ object WebDriverClient extends AddClientMethod with Logging {
 
     response match {
       case Failed(msg, r) =>
-        logger.debug(s"Server: failed request:$r exception msg:${System.lineSeparator }$msg"); None
+        logger.trace(s"Server: failed request:$r exception msg:${System.lineSeparator }$msg"); None
       case _ => Some(response)
     }
 
