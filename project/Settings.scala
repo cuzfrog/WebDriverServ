@@ -11,18 +11,18 @@ object Settings {
       "-unchecked",
       "-deprecation",
       "-feature"),
-    logBuffered := false
+    logBuffered := false,
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-actor" % "2.4.16",
+      "com.typesafe.akka" %% "akka-remote" % "2.4.16", {
+        val aksVersion = if (scalaVersion.value.startsWith("2.12.")) "0.5.1" else "0.5.0"
+        "com.github.romix.akka" %% "akka-kryo-serialization" % aksVersion
+      }
+    )
   )
 
-  val commonDependencies = Seq(
-    "com.typesafe.akka" %% "akka-actor" % "2.4.16",
-    "com.typesafe.akka" %% "akka-remote" % "2.4.16",
-    "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.0",
-    "org.apache.logging.log4j" %% "log4j-api-scala" % "2.7",
-    "org.apache.logging.log4j" % "log4j-api" % "2.7"
-  )
 
   val publishSettings = Seq(
-    publishTo := Some("My Bintray" at s"https://api.bintray.com/maven/cuzfrog/maven/${(name in ThisProject).value }/;publish=1")
+    publishTo := Some("My Bintray" at s"https://api.bintray.com/maven/cuzfrog/maven/${(name in ThisProject).value}/;publish=1")
   )
 }

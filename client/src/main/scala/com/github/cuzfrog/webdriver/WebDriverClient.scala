@@ -4,7 +4,8 @@ import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, P
 import akka.pattern.ask
 import akka.remote.RemoteScope
 import akka.util.Timeout
-import org.apache.logging.log4j.scala.Logging
+import com.typesafe.scalalogging.{StrictLogging => Logging}
+
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, TimeoutException}

@@ -3,7 +3,7 @@ package com.github.cuzfrog.webdriver
 import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 
 import com.github.cuzfrog.webdriver.WebDriverClient.control
-import org.apache.logging.log4j.scala.Logging
+import com.typesafe.scalalogging.{StrictLogging => Logging}
 
 private[webdriver] trait AddClientMethod extends Logging {
   /**

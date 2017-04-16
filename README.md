@@ -10,7 +10,7 @@ If you are doing something alike, go [A list of headless browsers](http://www.as
 And an excellent web crawling library: [scala-scraper](https://github.com/ruippeixotog/scala-scraper)
  by ruippeixotog.
 
-##Feature:
+## Feature:
 
 1. This project is written in Scala and includes two parts:
    * A server that runs a Selenium WebDriver and accepts client instruction.
@@ -22,9 +22,9 @@ And an excellent web crawling library: [scala-scraper](https://github.com/ruippe
 6. Define html parsing script at client side, and execute at server side.
 7. Supports JavaScript. Better browser emulation.
 
-##How to Use:
+## How to Use:
 
-###Start server:
+### Start server:
 
 Right now, you need to build for yourself:
 
@@ -48,13 +48,13 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 
 4. enter sbt , `test:run` or `run -Dconfig.file=your-config-file-path`(ignore settings in step 3)
 
-###Client code:
+### Client code:
 
 1. sbt `publishc`  (as you have cloned the whole project, this will publish client into your local repository.)
 
 2. add client dependency to your project:
 
-        libraryDependencies += "com.github.cuzfrog" %% "webdriver-client" % "0.2.6-M1"
+        libraryDependencies += "com.github.cuzfrog" %% "webdriver-client" % "0.2.7"
 
 3. code example:
 (Try to retrieve stub of the driver on server. If failed create a new one.
@@ -90,7 +90,7 @@ Then navigate to www.bing.com and search "Juno mission" and count word "Jupiter"
     
     `WordCountForJupiter`.sc: (A script that is sent to be executed on server. See below.)
     
-###Sending html parsing implementation to the server:
+### Sending html parsing implementation to the server:
 
 1. Define a String parsing function as script in .scala file under resources directory. e.g.
     ```scala
@@ -115,7 +115,7 @@ in file `resources/scripts/WordCountForJupiter.sc` (default path, which can be c
     element.getInnerHtml("WordCountForJupiter") //will return parsed result.
     ```
 
-###How to shutdown server:
+### How to shutdown server:
 
 1. Exiting sbt will kill the jvm, but not the WebDriver process.(Not recommended)
 
@@ -123,7 +123,7 @@ in file `resources/scripts/WordCountForJupiter.sc` (default path, which can be c
 
     _Quit single driver:_ call client `driver.kill()` this will not shutdown the server.
 
-###Mechanism (Important):
+### Mechanism (Important):
 
 Client and server communication is based on Akka serialization of shared messages.
 
@@ -142,7 +142,7 @@ in the cache. The use case is pretty intuitive.
 In fact, Selenium doc states that elements may expire when window has refreshed. Thus 
 useless references may pile on the server. Call `clean()` explicitly when needed.
 
-###About closure serialization and sending:
+### About closure serialization and sending:
 Failed experiments:
 
 1. Trying to serialize closure itself. Remote needs class definition.
