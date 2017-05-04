@@ -1,16 +1,18 @@
 package com.github.cuzfrog.webdriver
 
+import java.util.concurrent.atomic.AtomicReference
+
 import akka.actor.{Actor, ActorRef, ActorSystem, AddressFromURIString, Deploy, Props}
 import akka.pattern.ask
 import akka.remote.RemoteScope
 import akka.util.Timeout
 import com.typesafe.scalalogging.{StrictLogging => Logging}
 
-
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, TimeoutException}
 import scala.language.postfixOps
 import scala.reflect.ClassTag
+import scala.util.{Failure, Try}
 
 object WebDriverClient extends AddClientMethod with Logging {
 
@@ -19,14 +21,17 @@ object WebDriverClient extends AddClientMethod with Logging {
   private implicit val system: ActorSystem = ActorSystem("WebDriverCli")
   private implicit val timeout: Timeout = Timeout(timeoutSec seconds)
   private val remoteAddr = s"akka${ClientConfig.akkaProtocol }://WebDriverServ@$serverUri"
-  private val remoteListener =try {
+
+  private def resolveRemoteListener: Option[ActorRef] = Try {
     Await.result(system.actorSelection(s"$remoteAddr/user/handler").resolveOne(), timeout.duration)
-  } catch {
-    case e:Exception=>
-      this.shutdownClient()
-      logger.error("Fail to resolve remote actor ref")
-      throw e
+  } match {
+    case util.Success(actorRef) => Some(actorRef)
+    case Failure(_) =>
+      logger.error("Remote actor resolution failed.")
+      None
   }
+
+  private lazy val remoteListenerRef = new AtomicReference[Option[ActorRef]](resolveRemoteListener)
 
   logger.debug(s"WebDriverClient started with configs:server:$remoteAddr,timeout:$timeoutSec,actionInterval:$actionInterval")
 
@@ -50,19 +55,25 @@ object WebDriverClient extends AddClientMethod with Logging {
 
   // implicit execution context
   private[webdriver] def control(request: Request): Option[Response] = try {
+    remoteListenerRef.get match {
+      case Some(remoteListener) =>
+        Thread.sleep(actionInterval)
+        val tcpResponse = (remoteListener ? request).mapTo[Response]
+        val response = Await.result(tcpResponse, timeoutSec seconds)
 
-    Thread.sleep(actionInterval)
-    val tcpResponse = (remoteListener ? request).mapTo[Response]
-    val response = Await.result(tcpResponse, timeoutSec seconds)
-
-    response match {
-      case Failed(msg, r) =>
-        logger.trace(s"Server: failed request:$r exception msg:${System.lineSeparator }$msg"); None
-      case _ => Some(response)
+        response match {
+          case Failed(msg, r) =>
+            logger.trace(s"Server: failed request:$r exception msg:${System.lineSeparator }$msg"); None
+          case _ => Some(response)
+        }
+      case None => resolveRemoteListener.flatMap { newResolvedActorRef =>
+        remoteListenerRef.set(Some(newResolvedActorRef))
+        this.control(request)
+      }
     }
-
-  } catch {
-    case e: TimeoutException =>
+  }
+  catch {
+    case _: TimeoutException =>
       logger.debug(s"Server connection time out. Request[$request]")
       None
     case e: Exception =>
@@ -77,7 +88,7 @@ object WebDriverClient extends AddClientMethod with Logging {
         logger.debug(s"Msg's ClassTag runtime class:${ev.runtimeClass }")
       implicitPrint
       //println runtime class
-      val tcpResponse = (remoteListener ? msg).mapTo[T]
+      val tcpResponse = (remoteListenerRef.get().get ? msg).mapTo[T]
       Await.result(tcpResponse, timeoutSec seconds)
     }
 
@@ -99,8 +110,8 @@ object WebDriverClient extends AddClientMethod with Logging {
       control(GetInnerHtml(null, funcSrcCode)) collect { case r: Ready[String]@unchecked => r.data }
     }
 
-    private[webdriver] def sendToServer[T](msg: T) = {
-      remoteListener ! msg
+    private[webdriver] def sendToServer[T](msg: T): Unit = {
+      remoteListenerRef.get().foreach(a => a ! msg)
     }
   }
 }
