@@ -13,8 +13,8 @@ object Settings {
       "-feature"),
     logBuffered := false,
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.4.16",
-      "com.typesafe.akka" %% "akka-remote" % "2.4.16", {
+      "com.typesafe.akka" %% "akka-actor" % "2.4.17",
+      "com.typesafe.akka" %% "akka-remote" % "2.4.17", {
         val aksVersion = if (scalaVersion.value.startsWith("2.12.")) "0.5.1" else "0.5.0"
         "com.github.romix.akka" %% "akka-kryo-serialization" % aksVersion
       }
