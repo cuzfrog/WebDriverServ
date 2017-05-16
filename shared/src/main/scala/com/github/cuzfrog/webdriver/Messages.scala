@@ -10,16 +10,16 @@ private[webdriver] sealed trait Request extends Message {
   def execute(api: Api): Response
 }
 
-private[webdriver] case class RetrieveDriver(name: String) extends Request {
+private[webdriver] case class RetrieveDriver(name: String, willCleanCache: Boolean) extends Request {
   override def execute(api: Api): Response = {
-    api.retrieveDriver(name).map(Ready[Driver])
+    api.retrieveDriver(name, willCleanCache).map(Ready[Driver])
       .getOrElse(throw new NoSuchElementException(s"No driver[$name] on server."))
   }
 }
 
-private[webdriver] case class RetrieveOrNewDriver(name: String, typ: DriverType, waitSec: Int) extends Request {
+private[webdriver] case class RetrieveOrNewDriver(name: String, typ: DriverType, waitSec: Int, willCleanCache: Boolean) extends Request {
   override def execute(api: Api): Response = {
-    val dr = api.retrieveOrNewDriver(name, typ, waitSec)
+    val dr = api.retrieveOrNewDriver(name, typ, waitSec, willCleanCache)
     Ready[Driver](dr)
   }
 }

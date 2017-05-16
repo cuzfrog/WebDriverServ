@@ -4,8 +4,6 @@ import sbt._
 object Settings {
   val commonSettings = Seq(
     organization := "com.github.cuzfrog",
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
-    scalaVersion := "2.12.2",
     scalacOptions ++= Seq(
       "-Xlint",
       "-unchecked",

@@ -18,17 +18,22 @@ private[webdriver] trait AddClientMethod extends Logging {
     *                If retrieval succeeded, this is ignored.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def retrieveOrNewDriver(name: String, typ: DriverType = Chrome, waitSec: Int = 10): Option[ClientDriver] =
-    control(RetrieveOrNewDriver(name, typ, waitSec)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
+  def retrieveOrNewDriver(name: String, typ: DriverType = Chrome,
+                          waitSec: Int = 10, willCleanCache: Boolean = true): Option[ClientDriver] =
+    control(RetrieveOrNewDriver(
+      name, typ, waitSec, willCleanCache
+    )) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
 
   /**
     * Try to retrieve the stub of the driver instance from the server,
     * with all elements associated with this driver cleaned in the server cache.
+    *
     * @param name the name of the driver.
     * @return An Option of a client side driver class with necessary identification and interaction methods.
     */
-  def retrieveDriver(name: String): Option[ClientDriver] =
-    control(RetrieveDriver(name)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
+  def retrieveDriver(name: String, willCleanCache: Boolean = true): Option[ClientDriver] =
+    control(RetrieveDriver(name, willCleanCache)) collect { case r: Ready[Driver]@unchecked => ClientDriver(r.data) }
+
 
   /**
     * Send shutdown command to the server.

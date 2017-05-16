@@ -1,5 +1,8 @@
 import Settings._
 
+crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.2")
+scalaVersion in ThisBuild := "2.12.2"
+
 /*
  * Version info is in file "version.sbt"
  * Common build info is in file "common.sbt"
@@ -49,5 +52,5 @@ releaseProcess := Seq[ReleaseStep](
 )
 releaseNextVersion := { ver => Version(ver).map(_.bumpBugfix.string).getOrElse(versionFormatError) }
 addCommandAlias("bumpVer", "release with-defaults")
-addCommandAlias("publishc", ";reload;+ client/publish-local;+ shared/publish-local;bumpVer")
+addCommandAlias("publishc", ";reload;+ client/publish-local;+ shared/publish-local")
 addCommandAlias("publishBintray", ";reload;client/publish;shared/publish")
