@@ -17,9 +17,10 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
       "org.seleniumhq.selenium" % "selenium-java" % "2.53.1",
       "de.heikoseeberger" %% "akka-log4j" % "1.2.2",
       "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-      "org.apache.logging.log4j" % "log4j-core" % "2.7",
-      "org.apache.logging.log4j" %% "log4j-api-scala" % "2.7",
-      "org.apache.logging.log4j" % "log4j-api" % "2.7"
+      "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
+      "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.8.2",
+      "org.apache.logging.log4j" % "log4j-core" % "2.8.2",
+      "org.apache.logging.log4j" % "log4j-api" % "2.8.2"
     )
   )
 

@@ -54,7 +54,7 @@ download associated driver(you can find some of them in Selenium's wiki page.).
 
 2. add client dependency to your project:
 
-        libraryDependencies += "com.github.cuzfrog" %% "webdriver-client" % "0.3.0"
+        libraryDependencies += "com.github.cuzfrog" %% "webdriver-client" % "0.3.1"
 
 3. code example:
 (Try to retrieve stub of the driver on server. If failed create a new one.

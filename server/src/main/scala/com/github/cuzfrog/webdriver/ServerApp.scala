@@ -3,8 +3,6 @@ package com.github.cuzfrog.webdriver
 import java.io.InputStream
 import java.util.Properties
 
-import org.apache.logging.log4j.scala.Logging
-
 /**
   * Created by cuz on 1/23/17.
   */

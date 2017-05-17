@@ -1,9 +1,6 @@
 package com.github.cuzfrog.webdriver
 
 import akka.actor.{Actor, ActorSystem, Props}
-import org.apache.logging.log4j.scala.Logging
-
-import scala.language.postfixOps
 
 private[webdriver] object Server extends Logging {
 

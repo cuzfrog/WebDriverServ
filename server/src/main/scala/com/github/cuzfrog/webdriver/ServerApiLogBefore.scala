@@ -1,6 +1,4 @@
 package com.github.cuzfrog.webdriver
-
-import org.apache.logging.log4j.scala.Logging
 /**
   * Created by cuz on 1/25/17.
   */

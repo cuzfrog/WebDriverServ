@@ -1,7 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import org.apache.logging.log4j.scala.Logging
-
 import scala.reflect.runtime.{universe => ru}
 import scala.tools.reflect.ToolBox
 

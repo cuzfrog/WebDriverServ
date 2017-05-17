@@ -9,7 +9,7 @@ import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import org.openqa.selenium.{JavascriptExecutor, WebDriver, WebElement}
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -115,7 +115,7 @@ private class ServerApi extends Api {
       }
       case WindowContainer(window, sd) => sd.switchTo().window(window.handle).findElements(by)
     }
-    val elements = sEles.map {
+    val elements = sEles.asScala.map {
       sEle =>
         val ele = sEle.getTagName.toLowerCase match {
           case "frame" | "iframe" => Frame(newId, container.driver)
@@ -191,7 +191,7 @@ private class ServerApi extends Api {
     val dc = getDriverContainer(driver)
     val webDriver = dc.seleniumDriver
     val windowHandles = webDriver.getWindowHandles
-    windowHandles.map {
+    windowHandles.asScala.map {
       windowHandle =>
         createRegisterWindow(dc, driver, webDriver, windowHandle)
     }.toList

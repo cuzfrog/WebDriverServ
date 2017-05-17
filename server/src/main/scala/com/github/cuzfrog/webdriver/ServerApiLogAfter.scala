@@ -1,7 +1,5 @@
 package com.github.cuzfrog.webdriver
 
-import org.apache.logging.log4j.scala.Logging
-
 
 /**
   * Created by Cause Frog on 7/26/2016.
@@ -20,13 +18,13 @@ private[webdriver] trait ServerApiLogAfter extends ServerApi with Logging {
     logger.trace(s"[${driver.name }]created new driver[$typ]")
     driver
   }
-  abstract override def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int): Driver = {
-    val result = super.retrieveOrNewDriver(name, driverType, waitSec)
+  abstract override def retrieveOrNewDriver(name: String, driverType: DriverType, waitSec: Int, willCleanCache: Boolean): Driver = {
+    val result = super.retrieveOrNewDriver(name, driverType, waitSec, willCleanCache)
     logger.trace(s"[$name]retrieved or created driver:$result")
     result
   }
-  abstract override def retrieveDriver(name: String): Option[Driver] = {
-    val result = super.retrieveDriver(name)
+  abstract override def retrieveDriver(name: String, willCleanCache: Boolean): Option[Driver] = {
+    val result = super.retrieveDriver(name, willCleanCache)
     logger.trace(s"[$name]Driver retrieved with result:$result")
     result
   }
