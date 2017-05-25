@@ -1,6 +1,7 @@
+import com.typesafe.sbt.packager.Keys._
 import sbt._
 import sbt.Keys._
-
+import com.typesafe.sbt.packager.debian.DebianPlugin.autoImport.Debian
 
 object Server {
   private val compileExDep = SettingKey[sbt.File]("compile-ex-dep")
@@ -26,7 +27,8 @@ object Server {
       val contents = "name=%s\nversion=%s".format(name.value, version.value)
       IO.write(file, contents)
       Seq(file)
-    }.taskValue
+    }.taskValue,
+    debianNativeBuildOptions in Debian := Seq("-Zgzip", "-z3")
   )
 
   private lazy val DepExtractor ="""^"(.+)"\s+(%+)\s+"(.+)"\s+%\s+"(.+)"(\s+%\s+".+")?$""".r

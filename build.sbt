@@ -7,7 +7,7 @@ scalaVersion in ThisBuild := "2.12.2"
  * Version info is in file "version.sbt"
  * Common build info is in file "common.sbt"
  */
-
+val generateSh = taskKey[Unit]("Generate bat.")
 lazy val server = (project in file("./server")).dependsOn(shared % "test->test;compile->compile")
   .settings(commonSettings)
   .settings(Server.settings)
@@ -21,8 +21,9 @@ lazy val server = (project in file("./server")).dependsOn(shared % "test->test;c
       "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.8.2",
       "org.apache.logging.log4j" % "log4j-core" % "2.8.2",
       "org.apache.logging.log4j" % "log4j-api" % "2.8.2"
-    )
-  )
+    ),
+    addCommandAlias("packServer", ";reload;clean;compile;universal:packageBin")
+  ).enablePlugins(UniversalPlugin,JavaAppPackaging)
 
 lazy val client = (project in file("./client")).dependsOn(shared)
   .settings(commonSettings, publishSettings, Client.readmeVersionSettings)
