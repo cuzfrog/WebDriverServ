@@ -114,6 +114,14 @@ in file `resources/scripts/WordCountForJupiter.sc` (default path, which can be c
     val element:ClientElement = ???
     element.getInnerHtml("WordCountForJupiter") //will return parsed result.
     ```
+### Execution javascript:
+
+```scala
+val frame = window.findElement(...)
+frame.executeJS(...) // the context is not within this frame;
+val someElementInsideFrame = frame.findElement(...)
+someElementInsideFrame.executeJS(...) //yeah!
+```
 
 ### How to shutdown server:
 
