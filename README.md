@@ -15,7 +15,7 @@ And an excellent web crawling library: [scala-scraper](https://github.com/ruippe
 1. This project is written in Scala and includes two parts:
    * A server that runs a Selenium WebDriver and accepts client instruction.
    * A client which controls the server and is put in your code as dependency.
-2. Based on akka remoting(Artery). 
+2. Based on akka remoting(RPC with timeout). 
 3. Add some convenient methods to Selenium WebDriver. (like auto switch to window or frame.)
 4. Use typesafe Config.
 5. Complete client document.
